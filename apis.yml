@@ -1,0 +1,15 @@
+name: SPIRE
+description: SPIFFE Runtime Environment - A toolchain for establishing trust between
+  software systems across a wide variety of hosting platforms through automated attestation
+  and workload identity distribution
+url: https://spiffe.io/docs/latest/spire-about/
+tags:
+- Security
+- Identity
+- Authentication
+- Zero Trust
+- Cloud Native
+created: '2025'
+modified: '2025'
+apis: []
+common: []
