@@ -1,0 +1,233 @@
+openapi: 3.1.0
+info:
+  title: SPIRE OIDC Discovery Provider API
+  description: >-
+    The SPIRE OIDC Discovery Provider is a helper component that exposes a minimal
+    OpenID Connect discovery document and JSON Web Key Set (JWKS) endpoint. This
+    allows workloads to present JWT-SVIDs issued by SPIRE to systems that support
+    standard OIDC token validation, including cloud provider IAM systems such as
+    AWS, GCP, and Azure. The provider derives its key material from the SPIRE
+    Server or Agent trust bundle and serves it over HTTPS.
+  version: '1.0'
+  contact:
+    name: SPIFFE Community
+    url: https://spiffe.io/community/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+externalDocs:
+  description: SPIRE OIDC Discovery Provider Documentation
+  url: https://github.com/spiffe/spire/tree/main/support/oidc-discovery-provider
+servers:
+  - url: https://{domain}
+    description: SPIRE OIDC Discovery Provider
+    variables:
+      domain:
+        default: oidc-discovery.example.com
+        description: >-
+          The domain name configured for the OIDC discovery provider instance.
+tags:
+  - name: Discovery
+    description: >-
+      OpenID Connect discovery document endpoint that describes the OIDC
+      provider configuration and supported capabilities.
+  - name: Keys
+    description: >-
+      JSON Web Key Set endpoint that exposes public keys used to verify
+      JWT-SVIDs issued by SPIRE.
+paths:
+  /.well-known/openid-configuration:
+    get:
+      operationId: getOpenIDConfiguration
+      summary: Get OpenID Connect discovery document
+      description: >-
+        Returns the OpenID Connect discovery document describing the OIDC
+        provider's configuration. The document includes the issuer URL, JWKS
+        URI, supported response types, subject types, and supported signing
+        algorithms. This endpoint is used by OIDC-compatible systems to
+        auto-configure themselves to validate JWT-SVIDs issued by SPIRE.
+        The path prefix can be customized via the server_path_prefix option.
+      tags:
+        - Discovery
+      responses:
+        '200':
+          description: OpenID Connect discovery document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenIDConfiguration'
+  /keys:
+    get:
+      operationId: getJWKS
+      summary: Get JSON Web Key Set
+      description: >-
+        Returns the JSON Web Key Set (JWKS) containing the public keys used
+        to verify JWT-SVIDs issued by SPIRE. The keys are derived from the
+        SPIRE trust bundle and are automatically rotated as SPIRE rotates its
+        signing keys. Consumers must re-fetch this endpoint periodically to
+        stay current with key rotations. Supported signing algorithms include
+        RS256, ES256, and ES384.
+      tags:
+        - Keys
+      responses:
+        '200':
+          description: JSON Web Key Set containing public verification keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWKS'
+components:
+  schemas:
+    OpenIDConfiguration:
+      type: object
+      description: >-
+        OpenID Connect discovery document returned by the /.well-known/openid-configuration
+        endpoint. Describes the OIDC provider's issuer, key location, and supported
+        capabilities for JWT validation.
+      required:
+        - issuer
+        - jwks_uri
+        - authorization_endpoint
+        - response_types_supported
+        - subject_types_supported
+        - id_token_signing_alg_values_supported
+      properties:
+        issuer:
+          type: string
+          format: uri
+          description: >-
+            The HTTPS URL identifying the OIDC provider. This must match the
+            issuer claim in JWT-SVIDs issued by SPIRE and corresponds to the
+            trust domain's SPIFFE ID base URL.
+          example: https://oidc-discovery.example.com
+        jwks_uri:
+          type: string
+          format: uri
+          description: >-
+            URL of the JSON Web Key Set document containing public keys for
+            verifying JWT signatures. Typically the /keys endpoint on the
+            same host.
+          example: https://oidc-discovery.example.com/keys
+        authorization_endpoint:
+          type: string
+          format: uri
+          description: >-
+            URL of the authorization endpoint. SPIRE's OIDC provider does not
+            perform interactive authorization flows; this field is present for
+            OIDC spec compliance but is not functional.
+          example: https://oidc-discovery.example.com/authorize
+        response_types_supported:
+          type: array
+          description: >-
+            List of OAuth 2.0 response type values that this authorization
+            server supports. SPIRE supports the id_token response type.
+          items:
+            type: string
+            enum:
+              - id_token
+        subject_types_supported:
+          type: array
+          description: >-
+            List of subject identifier types supported. SPIRE uses the public
+            subject type.
+          items:
+            type: string
+            enum:
+              - public
+        id_token_signing_alg_values_supported:
+          type: array
+          description: >-
+            List of JWS signing algorithms supported for JWT-SVID signing.
+            SPIRE supports RS256, ES256, and ES384.
+          items:
+            type: string
+            enum:
+              - RS256
+              - ES256
+              - ES384
+    JWKS:
+      type: object
+      description: >-
+        JSON Web Key Set document containing the public keys used to verify
+        JWT-SVIDs issued by SPIRE. The keys correspond to the trust bundle
+        JWT authorities for the SPIRE trust domain.
+      required:
+        - keys
+      properties:
+        keys:
+          type: array
+          description: >-
+            Array of JSON Web Key objects representing the public keys in
+            the SPIRE trust bundle. Each key corresponds to a JWT authority
+            in the trust domain's bundle.
+          items:
+            $ref: '#/components/schemas/JWK'
+    JWK:
+      type: object
+      description: >-
+        A single JSON Web Key representing a public key used for JWT-SVID
+        signature verification.
+      required:
+        - kty
+        - use
+        - kid
+      properties:
+        kty:
+          type: string
+          description: >-
+            Key type. RSA for RS256 keys, EC for elliptic curve keys used
+            with ES256 and ES384.
+          enum:
+            - RSA
+            - EC
+        use:
+          type: string
+          description: >-
+            Intended use of the key. Always sig (signature verification) for
+            SPIRE JWT authority keys.
+          enum:
+            - sig
+        kid:
+          type: string
+          description: >-
+            Key identifier uniquely identifying this key within the JWKS.
+            Used to match the kid header in JWT-SVIDs to the correct
+            verification key.
+          example: abc123def456
+        alg:
+          type: string
+          description: >-
+            Algorithm intended for use with this key, such as RS256, ES256,
+            or ES384.
+          enum:
+            - RS256
+            - ES256
+            - ES384
+        n:
+          type: string
+          description: >-
+            RSA modulus value (Base64urlUInt-encoded). Present only for RSA
+            keys (kty: RSA).
+        e:
+          type: string
+          description: >-
+            RSA public exponent value (Base64urlUInt-encoded). Present only
+            for RSA keys (kty: RSA).
+          example: AQAB
+        crv:
+          type: string
+          description: >-
+            Elliptic curve name. Present only for EC keys (kty: EC).
+          enum:
+            - P-256
+            - P-384
+        x:
+          type: string
+          description: >-
+            Elliptic curve x-coordinate (Base64urlUInt-encoded). Present
+            only for EC keys (kty: EC).
+        y:
+          type: string
+          description: >-
+            Elliptic curve y-coordinate (Base64urlUInt-encoded). Present
+            only for EC keys (kty: EC).

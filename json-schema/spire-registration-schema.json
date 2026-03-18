@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://spiffe.io/schemas/spire/registration.json",
+  "title": "SPIRE Registration Entries",
+  "description": "Schema for SPIRE Server registration entry resources that define the mapping between workload selectors and SPIFFE IDs. Registration entries are the core configuration objects in SPIRE that control which workloads receive which SPIFFE identities, along with their TTL, DNS names, federated trust domains, and administrative properties.",
+  "type": "object",
+  "$defs": {
+    "RegistrationEntry": {
+      "type": "object",
+      "title": "RegistrationEntry",
+      "description": "A SPIRE registration entry defining the conditions under which a workload is issued a specific SPIFFE ID. The SPIRE Server matches workloads against the selectors in the entry and issues an SVID with the corresponding SPIFFE ID when all selectors are satisfied.",
+      "required": ["spiffe_id", "parent_id", "selectors"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this registration entry assigned by the SPIRE Server. Used to reference the entry in update and delete operations.",
+          "minLength": 1
+        },
+        "spiffe_id": {
+          "type": "string",
+          "description": "The SPIFFE ID that will be included in SVIDs issued to workloads matching this entry. Must be a valid SPIFFE URI in the format spiffe://{trust-domain}/{path}.",
+          "pattern": "^spiffe://[^/]+/.+$",
+          "format": "uri"
+        },
+        "parent_id": {
+          "type": "string",
+          "description": "The SPIFFE ID of the node or workload that is authorized to attest workloads for this entry. For workload entries this is typically the SPIFFE ID of the SPIRE Agent node.",
+          "pattern": "^spiffe://[^/]+/.*$",
+          "format": "uri"
+        },
+        "selectors": {
+          "type": "array",
+          "description": "List of selectors that must all match a workload for this entry to apply. Selectors are key-value pairs from attestation plugins such as k8s:pod-label, unix:uid, or docker:image.",
+          "items": {
+            "$ref": "#/$defs/Selector"
+          },
+          "minItems": 1
+        },
+        "ttl": {
+          "type": "integer",
+          "description": "Time-to-live in seconds for SVIDs issued from this entry. Overrides the SPIRE Server default TTL when set. A value of 0 uses the server default.",
+          "minimum": 0
+        },
+        "federates_with": {
+          "type": "array",
+          "description": "List of trust domain names this entry federates with. Workloads issued SVIDs from this entry will receive trust bundles for the specified federated trust domains, enabling cross-domain authentication.",
+          "items": {
+            "type": "string",
+            "description": "Trust domain name to federate with (e.g., 'other.example.com')",
+            "pattern": "^[a-zA-Z0-9._-]+(:[0-9]+)?$"
+          }
+        },
+        "dns_names": {
+          "type": "array",
+          "description": "DNS Subject Alternative Names to include in X.509-SVIDs issued from this entry. Allows workloads to present certificates matching standard DNS-based hostname validation in addition to their SPIFFE ID.",
+          "items": {
+            "type": "string",
+            "description": "A DNS name to include as a Subject Alternative Name in issued certificates",
+            "format": "hostname"
+          }
+        },
+        "admin": {
+          "type": "boolean",
+          "description": "When true, workloads matching this entry are granted administrative access to the SPIRE Server API. Administrative entries allow managing other entries and performing privileged operations."
+        },
+        "downstream": {
+          "type": "boolean",
+          "description": "When true, indicates this entry is for a downstream SPIRE Server in a nested SPIRE topology. Downstream servers receive their own SVID and trust bundle from the upstream SPIRE Server."
+        },
+        "expires_at": {
+          "type": "integer",
+          "description": "Unix timestamp (seconds since epoch) when this registration entry expires and is automatically deleted by the SPIRE Server. A value of 0 means the entry does not expire.",
+          "minimum": 0
+        },
+        "store_svid": {
+          "type": "boolean",
+          "description": "When true, instructs the SPIRE Agent to store the issued SVID on disk using the configured SVIDStore plugin rather than only serving it through the Workload API."
+        },
+        "x509_svid_ttl": {
+          "type": "integer",
+          "description": "TTL specifically for X.509-SVIDs issued from this entry in seconds. Takes precedence over the general ttl field for X.509 certificate issuance.",
+          "minimum": 0
+        },
+        "jwt_svid_ttl": {
+          "type": "integer",
+          "description": "TTL specifically for JWT-SVIDs issued from this entry in seconds. Takes precedence over the general ttl field for JWT token issuance.",
+          "minimum": 0
+        },
+        "hint": {
+          "type": "string",
+          "description": "Optional hint value included in SVIDs delivered to workloads via the Workload API to help them distinguish between multiple matching entries when a workload holds more than one SPIFFE ID.",
+          "maxLength": 1024
+        },
+        "created_at": {
+          "type": "integer",
+          "description": "Unix timestamp (seconds since epoch) when this entry was created in the SPIRE Server datastore.",
+          "minimum": 0
+        },
+        "revision_number": {
+          "type": "integer",
+          "description": "Monotonically increasing revision number that increments each time the entry is updated. Used for optimistic concurrency control.",
+          "minimum": 0
+        }
+      }
+    },
+    "Selector": {
+      "type": "object",
+      "title": "Selector",
+      "description": "A selector is a key-value condition from a SPIRE attestation plugin that must match a workload for a registration entry to apply. Selectors are provided by node and workload attestation plugins.",
+      "required": ["type", "value"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The attestation plugin or selector type that provides this selector (e.g., 'k8s', 'unix', 'docker', 'aws_iid', 'spiffe_id')",
+          "minLength": 1,
+          "maxLength": 255
+        },
+        "value": {
+          "type": "string",
+          "description": "The selector value to match against the workload's attested properties. The format is plugin-specific (e.g., 'pod-label:app:frontend', 'uid:1000', 'image-id:sha256:abc123').",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      }
+    },
+    "Bundle": {
+      "type": "object",
+      "title": "Bundle",
+      "description": "A SPIRE trust bundle containing the root CA certificates and JWT signing keys for a trust domain. Bundles are distributed to workloads via the Workload API and to federated trust domains via the Federation API.",
+      "required": ["trust_domain"],
+      "properties": {
+        "trust_domain": {
+          "type": "string",
+          "description": "The trust domain this bundle belongs to (e.g., 'example.org')",
+          "pattern": "^[a-zA-Z0-9._-]+(:[0-9]+)?$"
+        },
+        "x509_authorities": {
+          "type": "array",
+          "description": "X.509 root CA certificates for this trust domain used to validate X.509-SVIDs",
+          "items": {
+            "$ref": "#/$defs/X509Certificate"
+          }
+        },
+        "jwt_authorities": {
+          "type": "array",
+          "description": "JWT signing public keys for this trust domain used to validate JWT-SVIDs",
+          "items": {
+            "$ref": "#/$defs/JWTKey"
+          }
+        },
+        "refresh_hint": {
+          "type": "integer",
+          "description": "Suggested refresh interval in seconds for federation bundle consumers",
+          "minimum": 0
+        },
+        "sequence_number": {
+          "type": "integer",
+          "description": "Monotonically increasing sequence number that increments with each bundle update",
+          "minimum": 0
+        }
+      }
+    },
+    "X509Certificate": {
+      "type": "object",
+      "title": "X509Certificate",
+      "description": "A root CA X.509 certificate included in a SPIRE trust bundle",
+      "required": ["asn1"],
+      "properties": {
+        "asn1": {
+          "type": "string",
+          "description": "DER-encoded X.509 certificate bytes in base64 encoding",
+          "contentEncoding": "base64"
+        },
+        "tainted": {
+          "type": "boolean",
+          "description": "When true, indicates this certificate has been marked as compromised and should not be used for new SVID issuance, though it may still be in the bundle during rotation"
+        }
+      }
+    },
+    "JWTKey": {
+      "type": "object",
+      "title": "JWTKey",
+      "description": "A JWT signing public key included in a SPIRE trust bundle for JWT-SVID validation",
+      "required": ["public_key", "key_id"],
+      "properties": {
+        "public_key": {
+          "type": "string",
+          "description": "PKIX-encoded public key bytes in base64 encoding used for JWT-SVID signature verification",
+          "contentEncoding": "base64"
+        },
+        "key_id": {
+          "type": "string",
+          "description": "Key ID (kid) used in JWT-SVID headers to identify which key should be used for validation",
+          "minLength": 1
+        },
+        "expires_at": {
+          "type": "integer",
+          "description": "Unix timestamp when this key expires. Expired keys are removed from the bundle during rotation.",
+          "minimum": 0
+        },
+        "tainted": {
+          "type": "boolean",
+          "description": "When true, indicates this key has been marked as compromised and should not be used for JWT-SVID validation"
+        }
+      }
+    },
+    "Agent": {
+      "type": "object",
+      "title": "Agent",
+      "description": "A SPIRE Agent node registered with the SPIRE Server. Agents are attested by the server during startup and receive their own SPIFFE ID that is then used as the parent ID for workload registration entries.",
+      "required": ["id"],
+      "properties": {
+        "id": {
+          "type": "object",
+          "description": "The SPIFFE ID of this agent",
+          "properties": {
+            "trust_domain": {
+              "type": "string",
+              "description": "Trust domain of the agent's SPIFFE ID"
+            },
+            "path": {
+              "type": "string",
+              "description": "Path component of the agent's SPIFFE ID"
+            }
+          }
+        },
+        "attestation_type": {
+          "type": "string",
+          "description": "The node attestation plugin type used to attest this agent (e.g., 'aws_iid', 'k8s_psat', 'join_token', 'x509pop')"
+        },
+        "x509_svid_expires_at": {
+          "type": "integer",
+          "description": "Unix timestamp when the agent's X.509-SVID expires",
+          "minimum": 0
+        },
+        "x509_svid_serial_number": {
+          "type": "string",
+          "description": "Serial number of the agent's current X.509-SVID certificate"
+        },
+        "selectors": {
+          "type": "array",
+          "description": "Selectors produced by the node attestation plugin for this agent, used to match workload registration entries",
+          "items": {
+            "$ref": "#/$defs/Selector"
+          }
+        },
+        "banned": {
+          "type": "boolean",
+          "description": "When true, this agent has been administratively banned and will not be issued new SVIDs"
+        },
+        "can_reattest": {
+          "type": "boolean",
+          "description": "When true, this agent is allowed to re-attest and obtain a new SVID without being banned"
+        }
+      }
+    },
+    "FederationRelationship": {
+      "type": "object",
+      "title": "FederationRelationship",
+      "description": "A federation relationship between this SPIRE trust domain and a foreign trust domain, defining how trust bundle updates are exchanged.",
+      "required": ["trust_domain"],
+      "properties": {
+        "trust_domain": {
+          "type": "string",
+          "description": "The foreign trust domain name to federate with",
+          "pattern": "^[a-zA-Z0-9._-]+(:[0-9]+)?$"
+        },
+        "bundle_endpoint_url": {
+          "type": "string",
+          "description": "URL of the foreign trust domain's SPIFFE Federation Bundle Endpoint for automated trust bundle refresh",
+          "format": "uri"
+        },
+        "bundle_endpoint_profile": {
+          "type": "string",
+          "description": "Bundle endpoint profile type defining the authentication mechanism for bundle refresh",
+          "enum": ["https_web", "https_spiffe"]
+        },
+        "trust_domain_bundle": {
+          "$ref": "#/$defs/Bundle",
+          "description": "The current trust bundle from the foreign trust domain"
+        }
+      }
+    }
+  }
+}

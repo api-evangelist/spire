@@ -1,0 +1,178 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "spire": "https://spiffe.io/schemas/spire/",
+    "spiffe": "https://spiffe.io/schemas/spiffe/",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+    "sec": "https://w3id.org/security#",
+
+    "SVID": {
+      "@id": "spire:SVID",
+      "@context": {
+        "type": "spire:svidType",
+        "spiffe_id": {
+          "@id": "spiffe:id",
+          "@type": "@id"
+        },
+        "hint": "spire:hint",
+        "x509_svid": "spire:x509SVID",
+        "jwt_svid": "spire:jwtSVID"
+      }
+    },
+
+    "X509SVID": {
+      "@id": "spire:X509SVID",
+      "@context": {
+        "cert_chain": "sec:certificate",
+        "private_key": "sec:privateKey",
+        "expiry_time": {
+          "@id": "schema:expires",
+          "@type": "xsd:integer"
+        }
+      }
+    },
+
+    "JWTSVID": {
+      "@id": "spire:JWTSVID",
+      "@context": {
+        "token": "sec:token",
+        "expiry_time": {
+          "@id": "schema:expires",
+          "@type": "xsd:integer"
+        },
+        "issued_at": {
+          "@id": "dcterms:created",
+          "@type": "xsd:integer"
+        }
+      }
+    },
+
+    "RegistrationEntry": {
+      "@id": "spire:RegistrationEntry",
+      "@context": {
+        "id": "@id",
+        "spiffe_id": {
+          "@id": "spiffe:id",
+          "@type": "@id"
+        },
+        "parent_id": {
+          "@id": "spire:parentId",
+          "@type": "@id"
+        },
+        "selectors": {
+          "@id": "spire:selectors",
+          "@container": "@set"
+        },
+        "ttl": "spire:ttl",
+        "dns_names": {
+          "@id": "schema:name",
+          "@container": "@set"
+        },
+        "downstream": "spire:downstream",
+        "expires_at": {
+          "@id": "schema:expires",
+          "@type": "xsd:integer"
+        },
+        "federation_with": {
+          "@id": "spire:federatesWith",
+          "@container": "@set"
+        },
+        "admin": "spire:admin",
+        "store_svid": "spire:storeSvid",
+        "hint": "spire:hint",
+        "created_at": {
+          "@id": "dcterms:created",
+          "@type": "xsd:integer"
+        },
+        "revision_number": "spire:revisionNumber"
+      }
+    },
+
+    "Selector": {
+      "@id": "spire:Selector",
+      "@context": {
+        "type": "spire:selectorType",
+        "value": "schema:value"
+      }
+    },
+
+    "Bundle": {
+      "@id": "spire:Bundle",
+      "@context": {
+        "trust_domain": "spire:trustDomain",
+        "x509_authorities": {
+          "@id": "sec:x509Certificate",
+          "@container": "@set"
+        },
+        "jwt_authorities": {
+          "@id": "sec:publicKey",
+          "@container": "@set"
+        },
+        "refresh_hint": "spire:refreshHint",
+        "sequence_number": "spire:sequenceNumber"
+      }
+    },
+
+    "Agent": {
+      "@id": "spire:Agent",
+      "@context": {
+        "id": {
+          "@id": "spiffe:id",
+          "@type": "@id"
+        },
+        "attestation_type": "spire:attestationType",
+        "x509svid_expires_at": {
+          "@id": "schema:expires",
+          "@type": "xsd:integer"
+        },
+        "x509svid_serial_number": "schema:serialNumber",
+        "banned": "spire:banned",
+        "selectors": {
+          "@id": "spire:selectors",
+          "@container": "@set"
+        },
+        "can_reattest": "spire:canReattest"
+      }
+    },
+
+    "SPIFFEID": {
+      "@id": "spiffe:ID",
+      "@context": {
+        "trust_domain": "spiffe:trustDomain",
+        "path": "spiffe:path"
+      }
+    },
+
+    "OpenIDConfiguration": {
+      "@id": "spire:OIDCConfiguration",
+      "@context": {
+        "issuer": {
+          "@id": "schema:url",
+          "@type": "@id"
+        },
+        "jwks_uri": {
+          "@id": "spire:jwksUri",
+          "@type": "@id"
+        },
+        "authorization_endpoint": {
+          "@id": "spire:authorizationEndpoint",
+          "@type": "@id"
+        },
+        "response_types_supported": {
+          "@id": "spire:responseTypesSupported",
+          "@container": "@set"
+        },
+        "subject_types_supported": {
+          "@id": "spire:subjectTypesSupported",
+          "@container": "@set"
+        },
+        "id_token_signing_alg_values_supported": {
+          "@id": "spire:idTokenSigningAlgValuesSupported",
+          "@container": "@set"
+        }
+      }
+    }
+  }
+}

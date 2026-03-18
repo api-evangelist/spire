@@ -1,0 +1,99 @@
+openapi: 3.1.0
+info:
+  title: SPIRE Health Check API
+  description: >-
+    SPIRE Server and SPIRE Agent both expose an optional HTTP health checking
+    endpoint that provides liveness and readiness probes. When enabled via the
+    health_checks configuration block, the endpoint allows orchestrators such
+    as Kubernetes to determine whether a SPIRE component is alive and ready to
+    serve requests. The endpoint listens on a configurable address and port
+    (defaulting to localhost:80) and exposes two paths: one for liveness and
+    one for readiness.
+  version: '1.0'
+  contact:
+    name: SPIFFE Community
+    url: https://spiffe.io/community/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+externalDocs:
+  description: SPIRE Server Configuration Reference
+  url: https://spiffe.io/docs/latest/deploying/spire_server/
+servers:
+  - url: http://{bind_address}:{bind_port}
+    description: SPIRE Health Check Listener
+    variables:
+      bind_address:
+        default: localhost
+        description: Address the health check listener binds to.
+      bind_port:
+        default: '80'
+        description: Port the health check listener binds to.
+tags:
+  - name: Health
+    description: >-
+      Liveness and readiness health check endpoints for SPIRE Server and
+      SPIRE Agent components, suitable for use as Kubernetes probes.
+paths:
+  /live:
+    get:
+      operationId: getLiveness
+      summary: Liveness probe
+      description: >-
+        Returns HTTP 200 if the SPIRE component process is alive and running.
+        A non-200 response or connection failure indicates the process should
+        be restarted. This endpoint is suitable for use as a Kubernetes
+        livenessProbe. The path can be customized via the live_path
+        configuration option (default: /live).
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Component is alive
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+  /ready:
+    get:
+      operationId: getReadiness
+      summary: Readiness probe
+      description: >-
+        Returns HTTP 200 if the SPIRE component is ready to serve requests.
+        For the SPIRE Server, readiness indicates the server has completed
+        initialization and can accept gRPC connections from agents and
+        administrators. For the SPIRE Agent, readiness indicates it has
+        successfully attested to the server and is able to serve the Workload
+        API. The path can be customized via the ready_path configuration
+        option (default: /ready).
+      tags:
+        - Health
+      responses:
+        '200':
+          description: Component is ready to serve requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+        '503':
+          description: Component is not yet ready to serve requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthStatus'
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      description: >-
+        Health status response from the SPIRE health check endpoint.
+      properties:
+        status:
+          type: string
+          description: >-
+            Human-readable status string indicating the health state of
+            the component.
+          enum:
+            - ok
+            - unavailable
+          example: ok
