@@ -39,7 +39,7 @@ paths:
   /.well-known/openid-configuration:
     get:
       operationId: getOpenIDConfiguration
-      summary: Get OpenID Connect discovery document
+      summary: SPIRE Get OpenID Connect discovery document
       description: >-
         Returns the OpenID Connect discovery document describing the OIDC
         provider's configuration. The document includes the issuer URL, JWKS
@@ -59,7 +59,7 @@ paths:
   /keys:
     get:
       operationId: getJWKS
-      summary: Get JSON Web Key Set
+      summary: SPIRE Get JSON Web Key Set
       description: >-
         Returns the JSON Web Key Set (JWKS) containing the public keys used
         to verify JWT-SVIDs issued by SPIRE. The keys are derived from the

@@ -38,7 +38,7 @@ paths:
   /live:
     get:
       operationId: getLiveness
-      summary: Liveness probe
+      summary: SPIRE Liveness probe
       description: >-
         Returns HTTP 200 if the SPIRE component process is alive and running.
         A non-200 response or connection failure indicates the process should
@@ -57,7 +57,7 @@ paths:
   /ready:
     get:
       operationId: getReadiness
-      summary: Readiness probe
+      summary: SPIRE Readiness probe
       description: >-
         Returns HTTP 200 if the SPIRE component is ready to serve requests.
         For the SPIRE Server, readiness indicates the server has completed
