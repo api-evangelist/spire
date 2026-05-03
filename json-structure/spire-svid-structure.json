@@ -1,0 +1,77 @@
+{
+  "name": "SVID",
+  "description": "SPIFFE Verifiable Identity Document issued by SPIRE to attest workload identity.",
+  "fields": [
+    {
+      "name": "type",
+      "type": "string",
+      "description": "SVID type: x509 or jwt.",
+      "enum": ["x509", "jwt"],
+      "required": true
+    },
+    {
+      "name": "spiffe_id",
+      "type": "string",
+      "description": "The SPIFFE ID URI encoded in the SVID (e.g., spiffe://example.org/workload/frontend).",
+      "required": true
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "description": "Optional hint to distinguish between multiple SVIDs when a workload has more than one matching entry.",
+      "required": false
+    },
+    {
+      "name": "x509_svid",
+      "type": "object",
+      "description": "X.509-SVID payload — present when type is x509.",
+      "required": false,
+      "fields": [
+        {
+          "name": "cert_chain",
+          "type": "array",
+          "description": "Ordered list of DER-encoded (base64) X.509 certificates from leaf to last intermediate.",
+          "required": true
+        },
+        {
+          "name": "private_key",
+          "type": "string",
+          "description": "DER-encoded (base64) private key. Delivered only by the Workload API.",
+          "required": false
+        },
+        {
+          "name": "expiry_time",
+          "type": "integer",
+          "description": "Unix timestamp (seconds) when the X.509-SVID expires.",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "jwt_svid",
+      "type": "object",
+      "description": "JWT-SVID payload — present when type is jwt.",
+      "required": false,
+      "fields": [
+        {
+          "name": "token",
+          "type": "string",
+          "description": "Compact serialized JWT string (header.payload.signature).",
+          "required": true
+        },
+        {
+          "name": "expiry_time",
+          "type": "integer",
+          "description": "Unix timestamp (seconds) when the JWT-SVID expires.",
+          "required": true
+        },
+        {
+          "name": "issued_at",
+          "type": "integer",
+          "description": "Unix timestamp (seconds) when the JWT-SVID was issued.",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

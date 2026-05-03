@@ -85,6 +85,8 @@ apis:
         url: https://github.com/spiffe/spire
       - type: OpenAPI
         url: openapi/spire-health-openapi.yml
+      - type: JSONStructure
+        url: json-structure/spire-registration-structure.json
     tags:
       - Agent
       - Attestation
@@ -107,6 +109,8 @@ apis:
         url: https://github.com/spiffe/spire/tree/main/support/oidc-discovery-provider
       - type: OpenAPI
         url: openapi/spire-oidc-discovery-openapi.yml
+      - type: JSONStructure
+        url: json-structure/spire-svid-structure.json
     tags:
       - Cloud
       - Federation
@@ -140,8 +144,18 @@ common:
     url: json-schema/spire-svid-schema.json
   - type: JSONSchema
     url: json-schema/spire-registration-schema.json
+  - type: JSONStructure
+    url: json-structure/spire-svid-structure.json
+  - type: JSONStructure
+    url: json-structure/spire-registration-structure.json
   - type: JSON-LD
     url: json-ld/spire-context.jsonld
+  - type: SpectralRules
+    url: rules/spire-rules.yml
+  - type: Capabilities
+    url: capabilities/workload-identity.yaml
+  - type: Vocabulary
+    url: vocabulary/spire-vocabulary.yml
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

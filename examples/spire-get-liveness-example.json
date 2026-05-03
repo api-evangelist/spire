@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "http://localhost:80/live",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "status": "ok"
+    }
+  }
+}

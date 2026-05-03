@@ -1,0 +1,101 @@
+{
+  "name": "RegistrationEntry",
+  "description": "SPIRE Server registration entry defining the SPIFFE ID issued to workloads matching a set of selectors.",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "description": "Unique identifier assigned by the SPIRE Server.",
+      "required": false
+    },
+    {
+      "name": "spiffe_id",
+      "type": "string",
+      "description": "The SPIFFE ID issued to matching workloads (spiffe://{trust-domain}/{path}).",
+      "required": true
+    },
+    {
+      "name": "parent_id",
+      "type": "string",
+      "description": "SPIFFE ID of the node or parent workload authorized to attest this entry.",
+      "required": true
+    },
+    {
+      "name": "selectors",
+      "type": "array",
+      "description": "List of type:value selector pairs that must all match for this entry to apply.",
+      "required": true,
+      "items": {
+        "name": "Selector",
+        "fields": [
+          {
+            "name": "type",
+            "type": "string",
+            "description": "Attestation plugin type (e.g., k8s, unix, docker, aws_iid).",
+            "required": true
+          },
+          {
+            "name": "value",
+            "type": "string",
+            "description": "Selector value (e.g., ns:default, uid:1000, pod-label:app:frontend).",
+            "required": true
+          }
+        ]
+      }
+    },
+    {
+      "name": "ttl",
+      "type": "integer",
+      "description": "Time-to-live in seconds for SVIDs issued from this entry. 0 uses server default.",
+      "required": false
+    },
+    {
+      "name": "federates_with",
+      "type": "array",
+      "description": "Trust domain names this entry federates with.",
+      "required": false
+    },
+    {
+      "name": "dns_names",
+      "type": "array",
+      "description": "DNS Subject Alternative Names to include in X.509-SVIDs.",
+      "required": false
+    },
+    {
+      "name": "admin",
+      "type": "boolean",
+      "description": "Grants administrative access to the SPIRE Server API when true.",
+      "required": false
+    },
+    {
+      "name": "downstream",
+      "type": "boolean",
+      "description": "Marks this entry as a downstream SPIRE Server in a nested topology.",
+      "required": false
+    },
+    {
+      "name": "expires_at",
+      "type": "integer",
+      "description": "Unix timestamp after which this entry expires. 0 means no expiry.",
+      "required": false
+    },
+    {
+      "name": "hint",
+      "type": "string",
+      "description": "Optional hint for workloads holding multiple SVIDs.",
+      "required": false
+    },
+    {
+      "name": "created_at",
+      "type": "integer",
+      "description": "Unix timestamp when this entry was created.",
+      "required": false
+    },
+    {
+      "name": "revision_number",
+      "type": "integer",
+      "description": "Monotonically increasing revision counter.",
+      "required": false
+    }
+  ]
+}

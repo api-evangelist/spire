@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "https://oidc-discovery.example.com/.well-known/openid-configuration",
+    "headers": {}
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "issuer": "https://oidc-discovery.example.com",
+      "jwks_uri": "https://oidc-discovery.example.com/keys",
+      "authorization_endpoint": "https://oidc-discovery.example.com/authorize",
+      "response_types_supported": ["id_token"],
+      "subject_types_supported": ["public"],
+      "id_token_signing_alg_values_supported": ["RS256", "ES256", "ES384"]
+    }
+  }
+}

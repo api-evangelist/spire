@@ -1,0 +1,173 @@
+name: SPIRE Vocabulary
+description: >-
+  Normative vocabulary for SPIRE (SPIFFE Runtime Environment), the reference
+  implementation of the SPIFFE standard for workload identity. Covers identity
+  concepts, attestation mechanisms, credential formats, and operational terms.
+version: "1.0"
+created: "2026-05-02"
+modified: "2026-05-02"
+terms:
+  - term: SPIFFE
+    definition: >-
+      Secure Production Identity Framework for Everyone. An open standard for
+      defining and issuing identities to workloads in dynamic distributed systems.
+    tags:
+      - Standard
+      - Identity
+
+  - term: SPIRE
+    definition: >-
+      SPIFFE Runtime Environment. The reference implementation of the SPIFFE
+      standard. Manages a CA, performs attestation, and issues SVIDs.
+    tags:
+      - Project
+      - Identity
+
+  - term: SVID
+    definition: >-
+      SPIFFE Verifiable Identity Document. The credential issued by SPIRE that
+      encodes a SPIFFE ID. Comes in two forms: X.509-SVID and JWT-SVID.
+    tags:
+      - Credential
+      - Identity
+
+  - term: X.509-SVID
+    definition: >-
+      An X.509 certificate whose Subject Alternative Name URI field encodes a
+      SPIFFE ID. The primary credential format for mutual TLS (mTLS) between workloads.
+    tags:
+      - Credential
+      - X.509
+      - TLS
+
+  - term: JWT-SVID
+    definition: >-
+      A JSON Web Token whose subject claim encodes a SPIFFE ID. Used for
+      authentication to OIDC-compatible services like AWS IAM, GCP, and Azure.
+    tags:
+      - Credential
+      - JWT
+      - OIDC
+
+  - term: SPIFFE ID
+    definition: >-
+      A URI conforming to the spiffe:// scheme that uniquely identifies a workload
+      within a trust domain. Format: spiffe://{trust-domain}/{path}.
+    tags:
+      - Identity
+      - URI
+
+  - term: Trust Domain
+    definition: >-
+      A namespace for SPIFFE IDs managed by a single SPIRE Server. The trust
+      domain is the hostname portion of a SPIFFE ID (e.g., example.org).
+    tags:
+      - Identity
+      - Namespace
+
+  - term: Trust Bundle
+    definition: >-
+      The set of root CA certificates and JWT signing keys for a trust domain,
+      used to validate SVIDs from that domain. Bundles are distributed via the
+      Workload API and federation endpoints.
+    tags:
+      - Security
+      - Trust
+
+  - term: Registration Entry
+    definition: >-
+      A SPIRE Server configuration object that maps a set of workload selectors
+      to a SPIFFE ID. When all selectors match an attested workload, the server
+      issues an SVID with the configured SPIFFE ID.
+    tags:
+      - Configuration
+      - Identity
+
+  - term: Selector
+    definition: >-
+      A key-value pair from a SPIRE attestation plugin that describes a property
+      of an attested node or workload. Examples: k8s:ns:default, unix:uid:1000,
+      docker:image-id:sha256:abc123.
+    tags:
+      - Attestation
+      - Configuration
+
+  - term: Node Attestation
+    definition: >-
+      The process by which a SPIRE Agent proves its identity to the SPIRE Server
+      using a platform-specific mechanism such as AWS IID, GCP IIT, Kubernetes
+      PSAT, or TPM-based x509pop.
+    tags:
+      - Attestation
+      - Security
+
+  - term: Workload Attestation
+    definition: >-
+      The process by which a SPIRE Agent identifies a workload requesting an SVID
+      by inspecting its process attributes (PID, UID, labels) or container metadata.
+    tags:
+      - Attestation
+      - Security
+
+  - term: Workload API
+    definition: >-
+      A gRPC API exposed by the SPIRE Agent as a Unix domain socket, allowing
+      workloads to request their X.509-SVIDs and JWT-SVIDs without credentials.
+      Defined by the SPIFFE standard.
+    tags:
+      - API
+      - Identity
+      - gRPC
+
+  - term: Federation
+    definition: >-
+      The mechanism by which SPIRE trust domains share trust bundle material,
+      enabling workloads in different trust domains to authenticate each other
+      using SVIDs.
+    tags:
+      - Security
+      - Trust
+
+  - term: OIDC Discovery Provider
+    definition: >-
+      A SPIRE helper component that exposes an OpenID Connect discovery document
+      and JWKS endpoint, allowing external systems to validate JWT-SVIDs using
+      standard OIDC tooling.
+    tags:
+      - OIDC
+      - Federation
+      - JWT
+
+  - term: Liveness Probe
+    definition: >-
+      An HTTP endpoint exposed by SPIRE components returning 200 when the process
+      is running. Used by Kubernetes to determine if a component should be restarted.
+    tags:
+      - Operations
+      - Health
+
+  - term: Readiness Probe
+    definition: >-
+      An HTTP endpoint exposed by SPIRE components returning 200 when the component
+      is ready to serve requests. Used by Kubernetes to control traffic routing.
+    tags:
+      - Operations
+      - Health
+
+  - term: TTL
+    definition: >-
+      Time-to-live for an SVID in seconds. Controls how long an issued certificate
+      or JWT token is valid before the workload must refresh it.
+    tags:
+      - Security
+      - Configuration
+
+  - term: JWKS
+    definition: >-
+      JSON Web Key Set. A JSON document containing public keys used to verify
+      JWT signatures. SPIRE's OIDC Discovery Provider exposes a JWKS endpoint
+      to enable JWT-SVID validation.
+    tags:
+      - JWT
+      - Security
+      - OIDC

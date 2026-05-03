@@ -1,0 +1,82 @@
+extends: [[spectral:oas, recommended]]
+
+rules:
+  spire-operation-id-required:
+    description: All operations must have an operationId.
+    severity: error
+    given: "$.paths[*][get,post,put,patch,delete,head,options]"
+    then:
+      field: operationId
+      function: truthy
+
+  spire-operation-id-kebab-case:
+    description: operationId must use camelCase starting with a verb (get, list, create, update, delete, enable, restore, kill).
+    severity: warn
+    given: "$.paths[*][get,post,put,patch,delete].operationId"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(get|list|create|update|delete|enable|restore|kill|add|remove|upload|approve|deactivate|invite|track)[A-Z][a-zA-Z0-9]+$"
+
+  spire-summary-title-case:
+    description: Operation summaries must use Title Case.
+    severity: warn
+    given: "$.paths[*][get,post,put,patch,delete].summary"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][a-zA-Z0-9 /-]+$"
+
+  spire-tags-required:
+    description: Every operation must have at least one tag.
+    severity: warn
+    given: "$.paths[*][get,post,put,patch,delete]"
+    then:
+      field: tags
+      function: truthy
+
+  spire-response-200-required:
+    description: Every operation must define a 200 or 201 success response.
+    severity: error
+    given: "$.paths[*][get,post,put,patch,delete].responses"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          anyOf:
+            - required: ["200"]
+            - required: ["201"]
+
+  spire-servers-required:
+    description: The API must define at least one server.
+    severity: error
+    given: "$"
+    then:
+      field: servers
+      function: truthy
+
+  spire-info-contact-required:
+    description: The info object must include a contact entry.
+    severity: warn
+    given: "$.info"
+    then:
+      field: contact
+      function: truthy
+
+  spire-no-trailing-slash:
+    description: Paths must not have a trailing slash.
+    severity: warn
+    given: "$.paths"
+    then:
+      function: pattern
+      functionOptions:
+        notMatch: "/$"
+
+  spire-health-path-naming:
+    description: Health check paths should follow the /live or /ready convention.
+    severity: info
+    given: "$.paths"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(/live|/ready|/.well-known|/keys|/admin|/client)"

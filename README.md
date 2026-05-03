@@ -5,18 +5,18 @@ SPIRE (SPIFFE Runtime Environment) is the reference implementation of the SPIFFE
 
 ## Scope
 
-- **Type:** Index 
-- **Position:** Consuming 
-- **Access:** 3rd-Party 
+- **Type:** Index
+- **Position:** Consuming
+- **Access:** 3rd-Party
 
 ## Tags:
 
- - Security, Identity, Authentication, Zero Trust, Cloud Native, Graduated
+ - Authentication, Cloud Native, Graduated, Identity, Security, Zero Trust
 
 ## Timestamps
 
-- **Created:** 2025 
-- **Modified:** 2026-03-18 
+- **Created:** 2025
+- **Modified:** 2026-05-02
 
 ## APIs
 
@@ -25,10 +25,9 @@ The SPIRE Agent exposes the SPIFFE Workload API as a Unix domain socket, allowin
 
 **Human URL:** [https://spiffe.io/docs/latest/spire-about/spire-concepts/](https://spiffe.io/docs/latest/spire-about/spire-concepts/)
 
-
 #### Tags:
 
- - gRPC, Identity, X.509, JWT, Workload
+ - gRPC, Identity, JWT, Workload, X.509
 
 #### Properties
 
@@ -42,23 +41,22 @@ The SPIRE Server exposes a gRPC API used by administrators and the SPIRE Agent t
 
 **Human URL:** [https://spiffe.io/docs/latest/deploying/spire_server/](https://spiffe.io/docs/latest/deploying/spire_server/)
 
-
 #### Tags:
 
- - gRPC, Administration, Registration, Attestation, Server
+ - Administration, Attestation, gRPC, Registration, Server
 
 #### Properties
 
 - [Documentation](https://spiffe.io/docs/latest/deploying/spire_server/)
 - [Reference](https://github.com/spiffe/spire-api-sdk)
 - [JSONSchema](json-schema/spire-registration-schema.json)
+- [JSONStructure](json-structure/spire-registration-structure.json)
 - [GitHubRepository](https://github.com/spiffe/spire-api-sdk)
 
 ### SPIRE Agent API
 The SPIRE Agent runs on each node and handles workload attestation, caching SVIDs, and serving the Workload API. It exposes a health check endpoint and communicates with the SPIRE Server via node attestation to establish its own identity before issuing identities to workloads.
 
 **Human URL:** [https://spiffe.io/docs/latest/deploying/spire_agent/](https://spiffe.io/docs/latest/deploying/spire_agent/)
-
 
 #### Tags:
 
@@ -70,22 +68,23 @@ The SPIRE Agent runs on each node and handles workload attestation, caching SVID
 - [Reference](https://spiffe.io/docs/latest/deploying/spire_agent/)
 - [GitHubRepository](https://github.com/spiffe/spire)
 - [OpenAPI](openapi/spire-health-openapi.yml)
+- [JSONStructure](json-structure/spire-registration-structure.json)
 
 ### SPIRE OIDC Discovery API
 SPIRE includes an OIDC Discovery Provider that serves an OpenID Connect discovery document and JSON Web Key Set (JWKS) endpoint, enabling workloads to present JWT-SVIDs to systems that support standard OIDC token validation. This allows SPIRE-issued identities to be used with cloud provider IAM systems such as AWS, GCP, and Azure.
 
 **Human URL:** [https://spiffe.io/docs/latest/keyless/oidc-federation-aws/](https://spiffe.io/docs/latest/keyless/oidc-federation-aws/)
 
-
 #### Tags:
 
- - OIDC, JWT, Identity, Federation, Cloud
+ - Cloud, Federation, Identity, JWT, OIDC
 
 #### Properties
 
 - [Documentation](https://spiffe.io/docs/latest/keyless/oidc-federation-aws/)
 - [GitHubRepository](https://github.com/spiffe/spire/tree/main/support/oidc-discovery-provider)
 - [OpenAPI](openapi/spire-oidc-discovery-openapi.yml)
+- [JSONStructure](json-structure/spire-svid-structure.json)
 
 ## Common Properties
 
@@ -102,7 +101,22 @@ SPIRE includes an OIDC Discovery Provider that serves an OpenID Connect discover
 - [Stack Overflow](https://stackoverflow.com/questions/tagged/spiffe)
 - [JSONSchema](json-schema/spire-svid-schema.json)
 - [JSONSchema](json-schema/spire-registration-schema.json)
+- [JSONStructure](json-structure/spire-svid-structure.json)
+- [JSONStructure](json-structure/spire-registration-structure.json)
 - [JSON-LD](json-ld/spire-context.jsonld)
+- [SpectralRules](rules/spire-rules.yml)
+- [Vocabulary](vocabulary/spire-vocabulary.yml)
+
+## Capabilities
+
+### Shared Definitions
+
+- [SPIRE Health Check API](capabilities/shared/spire-health.yaml)
+- [SPIRE OIDC Discovery Provider API](capabilities/shared/spire-oidc-discovery.yaml)
+
+### Workflow Capabilities
+
+- [Workload Identity](capabilities/workload-identity.yaml) — Health monitoring and OIDC identity verification for SPIRE operators.
 
 ## Maintainers
 
