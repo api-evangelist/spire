@@ -1,132 +1,173 @@
-naftiko: "1.0.0-alpha1"
-
+naftiko: 1.0.0-alpha2
 info:
-  label: "SPIRE Workload Identity"
-  description: >-
-    Unified SPIRE capability for workload identity verification and health monitoring.
-    Combines the SPIRE health check and OIDC discovery APIs to support operators
-    managing SPIRE deployments — verifying component readiness, retrieving OIDC
-    configuration, and inspecting JWT signing keys for federation and token validation.
+  label: SPIRE Workload Identity
+  description: Unified SPIRE capability for workload identity verification and health monitoring. Combines the SPIRE health
+    check and OIDC discovery APIs to support operators managing SPIRE deployments — verifying component readiness, retrieving
+    OIDC configuration, and inspecting JWT signing keys for federation and token validation.
   tags:
-    - Security
-    - Identity
-    - Zero Trust
-    - Cloud Native
-    - OIDC
-    - Health
-  created: "2026-05-02"
-  modified: "2026-05-02"
-
+  - Security
+  - Identity
+  - Zero Trust
+  - Cloud Native
+  - OIDC
+  - Health
+  created: '2026-05-02'
+  modified: '2026-05-06'
 binds:
-  - namespace: env
-    keys:
-      SPIRE_HOST: SPIRE_HOST
-      SPIRE_PORT: SPIRE_PORT
-      SPIRE_OIDC_DOMAIN: SPIRE_OIDC_DOMAIN
-
+- namespace: env
+  keys:
+    SPIRE_HOST: SPIRE_HOST
+    SPIRE_PORT: SPIRE_PORT
+    SPIRE_OIDC_DOMAIN: SPIRE_OIDC_DOMAIN
 capability:
   consumes:
-    - import: spire-health
-      location: ./shared/spire-health.yaml
-    - import: spire-oidc
-      location: ./shared/spire-oidc-discovery.yaml
-
+  - type: http
+    namespace: spire-health
+    baseUri: http://{{SPIRE_HOST}}:{{SPIRE_PORT}}
+    description: SPIRE liveness and readiness health check endpoints.
+    resources:
+    - name: health
+      path: /
+      description: SPIRE health check probes.
+      operations:
+      - name: get-liveness
+        method: GET
+        description: Returns HTTP 200 if the SPIRE component process is alive.
+        inputParameters: []
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: get-readiness
+        method: GET
+        description: Returns HTTP 200 if the SPIRE component is ready to serve requests.
+        inputParameters: []
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  - type: http
+    namespace: spire-oidc
+    baseUri: https://{{SPIRE_OIDC_DOMAIN}}
+    description: SPIRE OIDC Discovery Provider endpoints.
+    resources:
+    - name: discovery
+      path: /.well-known
+      description: OpenID Connect discovery document endpoint.
+      operations:
+      - name: get-openid-configuration
+        method: GET
+        description: Returns the OpenID Connect discovery document.
+        inputParameters: []
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: keys
+      path: /keys
+      description: JSON Web Key Set endpoint.
+      operations:
+      - name: get-jwks
+        method: GET
+        description: Returns the JSON Web Key Set for JWT-SVID verification.
+        inputParameters: []
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
   exposes:
-    - type: rest
-      port: 8080
-      namespace: spire-workload-identity-api
-      description: "Unified REST API for SPIRE workload identity operations."
-      resources:
-        - path: /v1/health/live
-          name: liveness
-          description: "SPIRE component liveness probe."
-          operations:
-            - method: GET
-              name: get-liveness
-              description: "Check if the SPIRE component process is alive."
-              call: "spire-health.get-liveness"
-              outputParameters:
-                - type: object
-                  mapping: "$."
-
-        - path: /v1/health/ready
-          name: readiness
-          description: "SPIRE component readiness probe."
-          operations:
-            - method: GET
-              name: get-readiness
-              description: "Check if the SPIRE component is ready to serve requests."
-              call: "spire-health.get-readiness"
-              outputParameters:
-                - type: object
-                  mapping: "$."
-
-        - path: /v1/oidc/discovery
-          name: oidc-discovery
-          description: "OpenID Connect discovery document from SPIRE."
-          operations:
-            - method: GET
-              name: get-openid-configuration
-              description: "Retrieve the OIDC provider configuration document."
-              call: "spire-oidc.get-openid-configuration"
-              outputParameters:
-                - type: object
-                  mapping: "$."
-
-        - path: /v1/oidc/keys
-          name: oidc-keys
-          description: "JSON Web Key Set for JWT-SVID verification."
-          operations:
-            - method: GET
-              name: get-jwks
-              description: "Retrieve public keys used to verify JWT-SVIDs."
-              call: "spire-oidc.get-jwks"
-              outputParameters:
-                - type: object
-                  mapping: "$."
-
-    - type: mcp
-      port: 9090
-      namespace: spire-workload-identity-mcp
-      transport: http
-      description: "MCP server for AI-assisted SPIRE workload identity management."
-      tools:
-        - name: check-spire-liveness
-          description: "Check if the SPIRE component process is alive and running."
-          hints:
-            readOnly: true
-            idempotent: true
-          call: "spire-health.get-liveness"
-          outputParameters:
-            - type: object
-              mapping: "$."
-
-        - name: check-spire-readiness
-          description: "Check if the SPIRE component is ready to serve identity requests."
-          hints:
-            readOnly: true
-            idempotent: true
-          call: "spire-health.get-readiness"
-          outputParameters:
-            - type: object
-              mapping: "$."
-
-        - name: get-oidc-configuration
-          description: "Retrieve the OIDC discovery document describing SPIRE's identity provider configuration for JWT-SVID validation."
-          hints:
-            readOnly: true
-            idempotent: true
-          call: "spire-oidc.get-openid-configuration"
-          outputParameters:
-            - type: object
-              mapping: "$."
-
-        - name: get-jwt-signing-keys
-          description: "Retrieve the JSON Web Key Set containing public keys for verifying JWT-SVIDs issued by SPIRE."
-          hints:
-            readOnly: true
-            idempotent: true
-          call: "spire-oidc.get-jwks"
-          outputParameters:
-            - type: object
-              mapping: "$."
+  - type: rest
+    port: 8080
+    namespace: spire-workload-identity-api
+    description: Unified REST API for SPIRE workload identity operations.
+    resources:
+    - path: /v1/health/live
+      name: liveness
+      description: SPIRE component liveness probe.
+      operations:
+      - method: GET
+        name: get-liveness
+        description: Check if the SPIRE component process is alive.
+        call: spire-health.get-liveness
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/health/ready
+      name: readiness
+      description: SPIRE component readiness probe.
+      operations:
+      - method: GET
+        name: get-readiness
+        description: Check if the SPIRE component is ready to serve requests.
+        call: spire-health.get-readiness
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/oidc/discovery
+      name: oidc-discovery
+      description: OpenID Connect discovery document from SPIRE.
+      operations:
+      - method: GET
+        name: get-openid-configuration
+        description: Retrieve the OIDC provider configuration document.
+        call: spire-oidc.get-openid-configuration
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/oidc/keys
+      name: oidc-keys
+      description: JSON Web Key Set for JWT-SVID verification.
+      operations:
+      - method: GET
+        name: get-jwks
+        description: Retrieve public keys used to verify JWT-SVIDs.
+        call: spire-oidc.get-jwks
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    port: 9090
+    namespace: spire-workload-identity-mcp
+    transport: http
+    description: MCP server for AI-assisted SPIRE workload identity management.
+    tools:
+    - name: check-spire-liveness
+      description: Check if the SPIRE component process is alive and running.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: spire-health.get-liveness
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: check-spire-readiness
+      description: Check if the SPIRE component is ready to serve identity requests.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: spire-health.get-readiness
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-oidc-configuration
+      description: Retrieve the OIDC discovery document describing SPIRE's identity provider configuration for JWT-SVID validation.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: spire-oidc.get-openid-configuration
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-jwt-signing-keys
+      description: Retrieve the JSON Web Key Set containing public keys for verifying JWT-SVIDs issued by SPIRE.
+      hints:
+        readOnly: true
+        idempotent: true
+      call: spire-oidc.get-jwks
+      outputParameters:
+      - type: object
+        mapping: $.
