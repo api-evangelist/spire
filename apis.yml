@@ -122,9 +122,9 @@ common:
     url: https://spiffe.io/
   - type: Documentation
     url: https://spiffe.io/docs/latest/
-  - type: Getting Started
+  - type: GettingStarted
     url: https://spiffe.io/docs/latest/try/getting-started-k8s/
-  - type: GitHub Organization
+  - type: GitHubOrganization
     url: https://github.com/spiffe
   - type: GitHubRepository
     url: https://github.com/spiffe/spire
@@ -134,11 +134,11 @@ common:
     url: https://slack.spiffe.io
   - type: Blog
     url: https://spiffe.io/blog/
-  - type: Change Log
+  - type: ChangeLog
     url: https://github.com/spiffe/spire/blob/main/CHANGELOG.md
   - type: Security
     url: https://github.com/spiffe/spire/blob/main/SECURITY.md
-  - type: Stack Overflow
+  - type: StackOverflow
     url: https://stackoverflow.com/questions/tagged/spiffe
   - type: JSONSchema
     url: json-schema/spire-svid-schema.json
@@ -148,7 +148,7 @@ common:
     url: json-structure/spire-svid-structure.json
   - type: JSONStructure
     url: json-structure/spire-registration-structure.json
-  - type: JSON-LD
+  - type: JSONLD
     url: json-ld/spire-context.jsonld
   - type: SpectralRules
     url: rules/spire-rules.yml
