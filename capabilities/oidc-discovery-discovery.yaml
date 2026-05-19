@@ -1,0 +1,67 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: SPIRE OIDC Discovery Provider API — Discovery
+  description: 'SPIRE OIDC Discovery Provider API — Discovery. 1 operations. Lead operation: SPIRE Get OpenID Connect discovery
+    document. Self-contained Naftiko capability covering one Spire business surface.'
+  tags:
+  - Spire
+  - Discovery
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SPIRE_API_KEY: SPIRE_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: oidc-discovery-discovery
+    baseUri: https://{domain}
+    description: SPIRE OIDC Discovery Provider API — Discovery business capability. Self-contained, no shared references.
+    resources:
+    - name: .well-known-openid-configuration
+      path: /.well-known/openid-configuration
+      operations:
+      - name: getopenidconfiguration
+        method: GET
+        description: SPIRE Get OpenID Connect discovery document
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    namespace: oidc-discovery-discovery-rest
+    port: 8080
+    description: REST adapter for SPIRE OIDC Discovery Provider API — Discovery. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/well-known/openid-configuration
+      name: well-known-openid-configuration
+      description: REST surface for .well-known-openid-configuration.
+      operations:
+      - method: GET
+        name: getopenidconfiguration
+        description: SPIRE Get OpenID Connect discovery document
+        call: oidc-discovery-discovery.getopenidconfiguration
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: oidc-discovery-discovery-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for SPIRE OIDC Discovery Provider API — Discovery. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: spire-get-openid-connect-discovery
+      description: SPIRE Get OpenID Connect discovery document
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: oidc-discovery-discovery.getopenidconfiguration
+      outputParameters:
+      - type: object
+        mapping: $.

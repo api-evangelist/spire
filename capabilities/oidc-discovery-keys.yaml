@@ -1,0 +1,67 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: SPIRE OIDC Discovery Provider API — Keys
+  description: 'SPIRE OIDC Discovery Provider API — Keys. 1 operations. Lead operation: SPIRE Get JSON Web Key Set. Self-contained
+    Naftiko capability covering one Spire business surface.'
+  tags:
+  - Spire
+  - Keys
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SPIRE_API_KEY: SPIRE_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: oidc-discovery-keys
+    baseUri: https://{domain}
+    description: SPIRE OIDC Discovery Provider API — Keys business capability. Self-contained, no shared references.
+    resources:
+    - name: keys
+      path: /keys
+      operations:
+      - name: getjwks
+        method: GET
+        description: SPIRE Get JSON Web Key Set
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+  exposes:
+  - type: rest
+    namespace: oidc-discovery-keys-rest
+    port: 8080
+    description: REST adapter for SPIRE OIDC Discovery Provider API — Keys. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/keys
+      name: keys
+      description: REST surface for keys.
+      operations:
+      - method: GET
+        name: getjwks
+        description: SPIRE Get JSON Web Key Set
+        call: oidc-discovery-keys.getjwks
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: oidc-discovery-keys-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for SPIRE OIDC Discovery Provider API — Keys. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: spire-get-json-web-key
+      description: SPIRE Get JSON Web Key Set
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: oidc-discovery-keys.getjwks
+      outputParameters:
+      - type: object
+        mapping: $.
