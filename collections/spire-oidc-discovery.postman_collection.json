@@ -1,0 +1,222 @@
+{
+  "item": [
+    {
+      "id": "87028df5-692b-4ced-8e09-b0783ed50ff4",
+      "name": "Discovery",
+      "description": {
+        "content": "OpenID Connect discovery document endpoint that describes the OIDC provider configuration and supported capabilities.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "4cdb4a59-66e5-4d17-a4ad-6494f358ae61",
+          "name": "SPIRE Get OpenID Connect discovery document",
+          "request": {
+            "name": "SPIRE Get OpenID Connect discovery document",
+            "description": {
+              "content": "Returns the OpenID Connect discovery document describing the OIDC provider's configuration. The document includes the issuer URL, JWKS URI, supported response types, subject types, and supported signing algorithms. This endpoint is used by OIDC-compatible systems to auto-configure themselves to validate JWT-SVIDs issued by SPIRE. The path prefix can be customized via the server_path_prefix option.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ".well-known",
+                "openid-configuration"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "The domain name configured for the OIDC discovery provider instance.",
+                  "type": "any",
+                  "value": "{{domain}}",
+                  "key": "domain"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "6874aa7d-f72e-4ef8-a9a7-8308457af937",
+              "name": "OpenID Connect discovery document",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ".well-known",
+                    "openid-configuration"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "The domain name configured for the OIDC discovery provider instance.",
+                      "type": "any",
+                      "value": "{{domain}}",
+                      "key": "domain"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"issuer\": \"https://oidc-discovery.example.com\",\n  \"jwks_uri\": \"https://oidc-discovery.example.com/keys\",\n  \"authorization_endpoint\": \"https://oidc-discovery.example.com/authorize\",\n  \"response_types_supported\": [\n    \"id_token\",\n    \"id_token\"\n  ],\n  \"subject_types_supported\": [\n    \"public\",\n    \"public\"\n  ],\n  \"id_token_signing_alg_values_supported\": [\n    \"ES384\",\n    \"ES256\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    },
+    {
+      "id": "957f5741-2c21-4b08-9602-66328aa68649",
+      "name": "Keys",
+      "description": {
+        "content": "JSON Web Key Set endpoint that exposes public keys used to verify JWT-SVIDs issued by SPIRE.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "cbedefdb-3c42-487b-9047-43ee1477fa7a",
+          "name": "SPIRE Get JSON Web Key Set",
+          "request": {
+            "name": "SPIRE Get JSON Web Key Set",
+            "description": {
+              "content": "Returns the JSON Web Key Set (JWKS) containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys are derived from the SPIRE trust bundle and are automatically rotated as SPIRE rotates its signing keys. Consumers must re-fetch this endpoint periodically to stay current with key rotations. Supported signing algorithms include RS256, ES256, and ES384.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "keys"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "The domain name configured for the OIDC discovery provider instance.",
+                  "type": "any",
+                  "value": "{{domain}}",
+                  "key": "domain"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "82d3e489-f382-4b61-8c60-11a6b7e371d5",
+              "name": "JSON Web Key Set containing public verification keys",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "keys"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "The domain name configured for the OIDC discovery provider instance.",
+                      "type": "any",
+                      "value": "{{domain}}",
+                      "key": "domain"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"keys\": [\n    {\n      \"kty\": \"RSA\",\n      \"use\": \"sig\",\n      \"kid\": \"abc123def456\",\n      \"alg\": \"RS256\",\n      \"n\": \"string\",\n      \"e\": \"AQAB\",\n      \"crv\": \"P-256\",\n      \"x\": \"string\",\n      \"y\": \"string\"\n    },\n    {\n      \"kty\": \"RSA\",\n      \"use\": \"sig\",\n      \"kid\": \"abc123def456\",\n      \"alg\": \"RS256\",\n      \"n\": \"string\",\n      \"e\": \"AQAB\",\n      \"crv\": \"P-256\",\n      \"x\": \"string\",\n      \"y\": \"string\"\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "The domain name configured for the OIDC discovery provider instance.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "oidc-discovery.example.com",
+      "key": "domain"
+    },
+    {
+      "type": "string",
+      "value": "https://{{domain}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "b155c7b1-a8b3-42bb-870a-02f75ca77115",
+    "name": "SPIRE OIDC Discovery Provider API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The SPIRE OIDC Discovery Provider is a helper component that exposes a minimal OpenID Connect discovery document and JSON Web Key Set (JWKS) endpoint. This allows workloads to present JWT-SVIDs issued by SPIRE to systems that support standard OIDC token validation, including cloud provider IAM systems such as AWS, GCP, and Azure. The provider derives its key material from the SPIRE Server or Agent trust bundle and serves it over HTTPS.\n\nContact Support:\n Name: SPIFFE Community",
+      "type": "text/plain"
+    }
+  }
+}
