@@ -1,0 +1,886 @@
+"""
+SPIRE GraphQL API Schema
+Covers vessel tracking (AIS), flight tracking (ADSB), weather intelligence,
+maritime trade analytics, and vessel historical data.
+"""
+
+# ─────────────────────────────────────────────
+# Scalars
+# ─────────────────────────────────────────────
+
+scalar DateTime
+scalar Float
+scalar JSON
+
+# ─────────────────────────────────────────────
+# Enums
+# ─────────────────────────────────────────────
+
+enum VesselType {
+  CARGO
+  TANKER
+  PASSENGER
+  FISHING
+  SAILING
+  PLEASURE_CRAFT
+  HIGH_SPEED_CRAFT
+  SPECIAL_CRAFT
+  TOWING
+  DREDGING
+  DIVING_OPS
+  MILITARY
+  PILOT
+  SAR
+  TUG
+  PORT_TENDER
+  ANTI_POLLUTION
+  LAW_ENFORCEMENT
+  LOCAL_VESSEL
+  MEDICAL_TRANSPORT
+  NONCOMBATANT
+  SPARE
+  UNKNOWN
+}
+
+enum NavigationStatus {
+  UNDER_WAY_USING_ENGINE
+  AT_ANCHOR
+  NOT_UNDER_COMMAND
+  RESTRICTED_MANOEUVRABILITY
+  CONSTRAINED_BY_DRAUGHT
+  MOORED
+  AGROUND
+  ENGAGED_IN_FISHING
+  UNDER_WAY_SAILING
+  RESERVED_FOR_FUTURE_USE
+  AIS_SART
+  DEFAULT
+}
+
+enum AISMessageType {
+  POSITION_REPORT
+  VOYAGE_REPORT
+  STATIC_DATA
+  BASE_STATION_REPORT
+  AIDS_TO_NAVIGATION
+  BINARY_BROADCAST
+  MULTI_SLOT
+  LONG_RANGE
+}
+
+enum FlightStatus {
+  SCHEDULED
+  ACTIVE
+  LANDED
+  CANCELLED
+  DIVERTED
+  UNKNOWN
+}
+
+enum FlightPhase {
+  DEPARTURE
+  CLIMB
+  CRUISE
+  DESCENT
+  APPROACH
+  LANDED
+  TAXIING
+}
+
+enum WeatherCondition {
+  CLEAR
+  PARTLY_CLOUDY
+  CLOUDY
+  OVERCAST
+  FOG
+  RAIN
+  DRIZZLE
+  SNOW
+  SLEET
+  THUNDERSTORM
+  HAIL
+  BLIZZARD
+  UNKNOWN
+}
+
+enum TradeDirection {
+  IMPORT
+  EXPORT
+}
+
+enum PortCallType {
+  ARRIVAL
+  DEPARTURE
+  ANCHORAGE
+  TRANSIT
+}
+
+enum CargoType {
+  DRY_BULK
+  LIQUID_BULK
+  CONTAINER
+  GENERAL_CARGO
+  ROLL_ON_ROLL_OFF
+  REFRIGERATED
+  VEHICLE
+  HEAVY_LIFT
+  BREAKBULK
+  GAS
+  CHEMICAL
+  CRUDE_OIL
+  PETROLEUM_PRODUCT
+  OTHER
+}
+
+enum SortOrder {
+  ASC
+  DESC
+}
+
+# ─────────────────────────────────────────────
+# Core Location & Geometry Types
+# ─────────────────────────────────────────────
+
+"""A geographic point expressed as WGS-84 coordinates."""
+type GeoPoint {
+  latitude: Float!
+  longitude: Float!
+}
+
+"""A bounding box for geographic queries."""
+type BoundingBox {
+  minLatitude: Float!
+  minLongitude: Float!
+  maxLatitude: Float!
+  maxLongitude: Float!
+}
+
+"""A GeoJSON polygon or multipolygon area."""
+type GeoArea {
+  type: String!
+  coordinates: JSON!
+}
+
+# ─────────────────────────────────────────────
+# AIS / Vessel Tracking Types
+# ─────────────────────────────────────────────
+
+"""Maritime vessel identity and static attributes."""
+type Vessel {
+  mmsi: String!
+  imo: String
+  name: String
+  callSign: String
+  flag: String
+  vesselType: VesselType
+  grossTonnage: Float
+  deadweightTonnage: Float
+  lengthOverall: Float
+  beam: Float
+  draught: Float
+  yearBuilt: Int
+  buildCountry: String
+  classificationSociety: String
+  owner: String
+  operator: String
+  manager: String
+  latestPosition: VesselPosition
+  voyage: VoyageInfo
+  portCalls(limit: Int, offset: Int): [PortCall!]
+  historicalPositions(startTime: DateTime!, endTime: DateTime!, limit: Int): [VesselPosition!]
+  cargoHistory(limit: Int, offset: Int): [CargoEvent!]
+}
+
+"""A real-time or archived AIS position report for a vessel."""
+type VesselPosition {
+  mmsi: String!
+  timestamp: DateTime!
+  coordinates: GeoPoint!
+  speedOverGround: Float
+  courseOverGround: Float
+  trueHeading: Float
+  rateOfTurn: Float
+  navigationStatus: NavigationStatus
+  positionAccuracy: Boolean
+  messageType: AISMessageType
+  satelliteSource: String
+  receivedAt: DateTime
+}
+
+"""Current voyage information from an AIS voyage report."""
+type VoyageInfo {
+  mmsi: String!
+  destination: String
+  eta: DateTime
+  maximumStaticDraught: Float
+  personsOnBoard: Int
+  hazardousCargo: String
+  updatedAt: DateTime
+}
+
+"""A record of a vessel calling at a port."""
+type PortCall {
+  id: ID!
+  vessel: Vessel
+  port: Port!
+  portCallType: PortCallType!
+  arrivalTime: DateTime
+  departureTime: DateTime
+  berthName: String
+  terminalName: String
+  cargo: CargoType
+  cargoQuantity: Float
+  cargoUnit: String
+  draught: Float
+  anchorageTime: Float
+}
+
+"""An AIS-derived cargo loading or unloading event."""
+type CargoEvent {
+  id: ID!
+  vessel: Vessel
+  port: Port
+  eventTime: DateTime!
+  cargoType: CargoType
+  estimatedQuantity: Float
+  quantityUnit: String
+  commodity: String
+  tradeDirection: TradeDirection
+  confidence: Float
+}
+
+# ─────────────────────────────────────────────
+# Port & Trade Types
+# ─────────────────────────────────────────────
+
+"""A maritime port or terminal."""
+type Port {
+  unlocode: String!
+  name: String!
+  country: String!
+  region: String
+  coordinates: GeoPoint!
+  timezone: String
+  portType: String
+  annualThroughput: Float
+  anchorageAreas: [GeoArea!]
+  berthCount: Int
+  maxVesselLength: Float
+  maxDraught: Float
+  portCalls(startTime: DateTime, endTime: DateTime, limit: Int): [PortCall!]
+  tradeFlows(startTime: DateTime, endTime: DateTime): [TradeFlow!]
+}
+
+"""An aggregated trade flow between two ports or countries."""
+type TradeFlow {
+  id: ID!
+  originPort: Port
+  destinationPort: Port
+  originCountry: String
+  destinationCountry: String
+  commodity: String
+  cargoType: CargoType
+  tradeDirection: TradeDirection
+  period: String
+  totalQuantity: Float
+  quantityUnit: String
+  vesselCount: Int
+  estimatedValue: Float
+  currency: String
+}
+
+"""A commodity traded via maritime routes."""
+type Commodity {
+  code: String!
+  name: String!
+  category: String
+  hsCode: String
+  cargoType: CargoType
+  tradeFlows(startTime: DateTime, endTime: DateTime, limit: Int): [TradeFlow!]
+}
+
+# ─────────────────────────────────────────────
+# Flight / ADSB Tracking Types
+# ─────────────────────────────────────────────
+
+"""An aircraft identity record."""
+type Aircraft {
+  icao24: String!
+  registration: String
+  aircraftType: String
+  icaoTypeCode: String
+  manufacturer: String
+  model: String
+  operator: String
+  operatorIcao: String
+  country: String
+  engineCount: Int
+  engineType: String
+  yearManufactured: Int
+  latestPosition: AircraftPosition
+  currentFlight: Flight
+  flightHistory(startTime: DateTime!, endTime: DateTime!, limit: Int): [Flight!]
+}
+
+"""A real-time or archived ADSB position report for an aircraft."""
+type AircraftPosition {
+  icao24: String!
+  timestamp: DateTime!
+  coordinates: GeoPoint!
+  altitudeBaro: Float
+  altitudeGeo: Float
+  groundSpeed: Float
+  trueTrack: Float
+  verticalRate: Float
+  squawk: String
+  onGround: Boolean
+  flightPhase: FlightPhase
+  satelliteSource: String
+  receivedAt: DateTime
+}
+
+"""A flight record linking departure and arrival airports."""
+type Flight {
+  id: ID!
+  callsign: String
+  aircraft: Aircraft
+  airline: Airline
+  departureAirport: Airport
+  arrivalAirport: Airport
+  scheduledDeparture: DateTime
+  actualDeparture: DateTime
+  scheduledArrival: DateTime
+  estimatedArrival: DateTime
+  actualArrival: DateTime
+  status: FlightStatus
+  flightNumber: String
+  iataFlightNumber: String
+  distanceKm: Float
+  durationMinutes: Int
+  positions(startTime: DateTime, endTime: DateTime, limit: Int): [AircraftPosition!]
+}
+
+"""An airline operating passenger or cargo flights."""
+type Airline {
+  icaoCode: String!
+  iataCode: String
+  name: String!
+  country: String
+  callsign: String
+  active: Boolean
+  fleets: [Aircraft!]
+}
+
+"""An airport (ICAO)."""
+type Airport {
+  icaoCode: String!
+  iataCode: String
+  name: String!
+  city: String
+  country: String
+  coordinates: GeoPoint!
+  elevation: Float
+  timezone: String
+  runwayCount: Int
+  maxRunwayLength: Float
+  departures(startTime: DateTime, endTime: DateTime, limit: Int): [Flight!]
+  arrivals(startTime: DateTime, endTime: DateTime, limit: Int): [Flight!]
+}
+
+# ─────────────────────────────────────────────
+# Weather Intelligence Types
+# ─────────────────────────────────────────────
+
+"""A weather observation or forecast at a specific point and time."""
+type WeatherObservation {
+  id: ID!
+  coordinates: GeoPoint!
+  timestamp: DateTime!
+  condition: WeatherCondition
+  temperatureCelsius: Float
+  dewPointCelsius: Float
+  relativeHumidity: Float
+  windSpeedKnots: Float
+  windDirectionDegrees: Float
+  gustSpeedKnots: Float
+  pressureHpa: Float
+  visibilityKm: Float
+  waveHeightMeters: Float
+  wavePeriodSeconds: Float
+  waveDirectionDegrees: Float
+  swellHeightMeters: Float
+  swellPeriodSeconds: Float
+  currentSpeedKnots: Float
+  currentDirectionDegrees: Float
+  precipitationMmPerHour: Float
+  cloudCoverPercent: Float
+  source: String
+  model: String
+  forecastHorizonHours: Int
+}
+
+"""A weather forecast for a route or region."""
+type WeatherForecast {
+  id: ID!
+  region: GeoArea
+  generatedAt: DateTime!
+  validFrom: DateTime!
+  validTo: DateTime!
+  model: String
+  resolution: String
+  observations: [WeatherObservation!]
+  alerts: [WeatherAlert!]
+}
+
+"""A maritime or aviation weather alert or advisory."""
+type WeatherAlert {
+  id: ID!
+  type: String!
+  severity: String!
+  area: GeoArea
+  issuedAt: DateTime!
+  validFrom: DateTime!
+  validTo: DateTime!
+  headline: String
+  description: String
+  source: String
+}
+
+"""A tropical cyclone or storm track."""
+type StormTrack {
+  id: ID!
+  name: String!
+  basinCode: String
+  category: String
+  issuedAt: DateTime!
+  positions: [StormPosition!]
+}
+
+"""A point on a storm track."""
+type StormPosition {
+  timestamp: DateTime!
+  coordinates: GeoPoint!
+  maxWindSpeedKnots: Float
+  minPressureHpa: Float
+  radiusOfMaxWindsKm: Float
+  forecastHorizonHours: Int
+}
+
+# ─────────────────────────────────────────────
+# Satellite & Coverage Types
+# ─────────────────────────────────────────────
+
+"""A maritime zone such as an EEZ, strait, or traffic separation scheme."""
+type MaritimeZone {
+  id: ID!
+  name: String!
+  zoneType: String!
+  country: String
+  area: GeoArea!
+  description: String
+}
+
+"""A vessel route waypoint derived from AIS prediction."""
+type RouteWaypoint {
+  sequence: Int!
+  coordinates: GeoPoint!
+  estimatedArrival: DateTime
+  portUnlocode: String
+}
+
+"""A predicted vessel route."""
+type VesselRoute {
+  mmsi: String!
+  generatedAt: DateTime!
+  confidence: Float
+  waypoints: [RouteWaypoint!]!
+  estimatedDestinationUnlocode: String
+  estimatedArrival: DateTime
+}
+
+"""An ocean current observation."""
+type OceanCurrent {
+  coordinates: GeoPoint!
+  timestamp: DateTime!
+  speedKnots: Float!
+  directionDegrees: Float!
+  depthMeters: Float
+  source: String
+}
+
+"""A vessel congestion or density heat-map cell."""
+type DensityCell {
+  boundingBox: BoundingBox!
+  vesselCount: Int!
+  averageSpeed: Float
+  periodStart: DateTime!
+  periodEnd: DateTime!
+}
+
+"""An AIS anomaly or dark vessel detection event."""
+type AnomalyEvent {
+  id: ID!
+  mmsi: String!
+  vessel: Vessel
+  detectedAt: DateTime!
+  anomalyType: String!
+  description: String
+  coordinates: GeoPoint
+  severity: String
+}
+
+"""A Spire satellite pass over a geographic area."""
+type SatellitePass {
+  id: ID!
+  satelliteId: String!
+  satelliteName: String
+  passStartTime: DateTime!
+  passEndTime: DateTime!
+  maxElevationDegrees: Float
+  groundTrack: [GeoPoint!]
+  coverageArea: GeoArea
+}
+
+"""Satellite coverage statistics for a region and time window."""
+type CoverageStatistics {
+  region: GeoArea!
+  startTime: DateTime!
+  endTime: DateTime!
+  satelliteCount: Int!
+  totalPassDurationMinutes: Float!
+  averageRevisitMinutes: Float!
+  maximumGapMinutes: Float!
+}
+
+# ─────────────────────────────────────────────
+# Pagination & Connection Types
+# ─────────────────────────────────────────────
+
+"""Pagination metadata for list responses."""
+type PageInfo {
+  totalCount: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  offset: Int!
+  limit: Int!
+}
+
+type VesselConnection {
+  nodes: [Vessel!]!
+  pageInfo: PageInfo!
+}
+
+type FlightConnection {
+  nodes: [Flight!]!
+  pageInfo: PageInfo!
+}
+
+type PortCallConnection {
+  nodes: [PortCall!]!
+  pageInfo: PageInfo!
+}
+
+type TradeFlowConnection {
+  nodes: [TradeFlow!]!
+  pageInfo: PageInfo!
+}
+
+type WeatherObservationConnection {
+  nodes: [WeatherObservation!]!
+  pageInfo: PageInfo!
+}
+
+# ─────────────────────────────────────────────
+# Input Types
+# ─────────────────────────────────────────────
+
+"""Bounding-box filter for geographic queries."""
+input BoundingBoxInput {
+  minLatitude: Float!
+  minLongitude: Float!
+  maxLatitude: Float!
+  maxLongitude: Float!
+}
+
+"""Point + radius filter."""
+input RadiusFilterInput {
+  latitude: Float!
+  longitude: Float!
+  radiusKm: Float!
+}
+
+"""Time-range filter."""
+input TimeRangeInput {
+  startTime: DateTime!
+  endTime: DateTime!
+}
+
+"""Pagination input."""
+input PaginationInput {
+  limit: Int
+  offset: Int
+}
+
+"""Filter for vessel search queries."""
+input VesselFilterInput {
+  mmsi: [String!]
+  imo: [String!]
+  name: String
+  flag: [String!]
+  vesselType: [VesselType!]
+  boundingBox: BoundingBoxInput
+  radius: RadiusFilterInput
+  minGrossTonnage: Float
+  maxGrossTonnage: Float
+  navigationStatus: [NavigationStatus!]
+}
+
+"""Filter for port call queries."""
+input PortCallFilterInput {
+  portUnlocode: [String!]
+  mmsi: [String!]
+  imo: [String!]
+  timeRange: TimeRangeInput
+  portCallType: [PortCallType!]
+  cargoType: [CargoType!]
+  minCargoQuantity: Float
+}
+
+"""Filter for trade flow queries."""
+input TradeFlowFilterInput {
+  originCountry: [String!]
+  destinationCountry: [String!]
+  originPortUnlocode: [String!]
+  destinationPortUnlocode: [String!]
+  commodity: [String!]
+  cargoType: [CargoType!]
+  timeRange: TimeRangeInput
+  tradeDirection: TradeDirection
+}
+
+"""Filter for flight queries."""
+input FlightFilterInput {
+  callsign: String
+  icao24: [String!]
+  airlineIcao: [String!]
+  departureAirportIcao: [String!]
+  arrivalAirportIcao: [String!]
+  status: [FlightStatus!]
+  timeRange: TimeRangeInput
+  boundingBox: BoundingBoxInput
+}
+
+"""Filter for weather queries."""
+input WeatherFilterInput {
+  boundingBox: BoundingBoxInput
+  radius: RadiusFilterInput
+  timeRange: TimeRangeInput
+  model: String
+  includeForecasts: Boolean
+}
+
+"""Input for creating a vessel tracking subscription."""
+input VesselSubscriptionInput {
+  mmsi: [String!]
+  boundingBox: BoundingBoxInput
+  vesselType: [VesselType!]
+  minSpeedKnots: Float
+  maxSpeedKnots: Float
+  webhookUrl: String
+  callbackSecret: String
+}
+
+"""Input for creating a flight tracking subscription."""
+input FlightSubscriptionInput {
+  icao24: [String!]
+  callsign: [String!]
+  airlineIcao: [String!]
+  boundingBox: BoundingBoxInput
+  webhookUrl: String
+  callbackSecret: String
+}
+
+"""Sort input."""
+input SortInput {
+  field: String!
+  order: SortOrder
+}
+
+# ─────────────────────────────────────────────
+# Subscription / Streaming Configuration
+# ─────────────────────────────────────────────
+
+"""A vessel tracking data subscription."""
+type VesselSubscription {
+  id: ID!
+  name: String
+  filter: JSON
+  webhookUrl: String
+  active: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lastDeliveredAt: DateTime
+}
+
+"""A flight tracking data subscription."""
+type FlightSubscription {
+  id: ID!
+  name: String
+  filter: JSON
+  webhookUrl: String
+  active: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  lastDeliveredAt: DateTime
+}
+
+# ─────────────────────────────────────────────
+# API Metadata
+# ─────────────────────────────────────────────
+
+"""API usage and quota information for the current token."""
+type ApiUsage {
+  quotaLimit: Int
+  quotaUsed: Int
+  quotaRemaining: Int
+  resetAt: DateTime
+  rateLimitPerMinute: Int
+  dataLayers: [String!]
+}
+
+# ─────────────────────────────────────────────
+# Query Root
+# ─────────────────────────────────────────────
+
+type Query {
+  # ── Vessel Tracking ─────────────────────────
+
+  """Fetch a single vessel by MMSI."""
+  vessel(mmsi: String!): Vessel
+
+  """Search vessels using filters."""
+  vessels(filter: VesselFilterInput, pagination: PaginationInput, sort: SortInput): VesselConnection!
+
+  """Get the latest AIS position for a list of vessels."""
+  vesselPositions(mmsiList: [String!]!, maxAgeMinutes: Int): [VesselPosition!]!
+
+  """Get historical AIS positions for a vessel."""
+  vesselPositionHistory(mmsi: String!, timeRange: TimeRangeInput!, limit: Int): [VesselPosition!]!
+
+  """Get all vessels currently in a geographic area."""
+  vesselsInArea(boundingBox: BoundingBoxInput, radius: RadiusFilterInput, limit: Int): [Vessel!]!
+
+  # ── Port Calls & Trade ───────────────────────
+
+  """Fetch a single port by UN/LOCODE."""
+  port(unlocode: String!): Port
+
+  """Search ports."""
+  ports(name: String, country: String, boundingBox: BoundingBoxInput, limit: Int): [Port!]!
+
+  """Query port calls."""
+  portCalls(filter: PortCallFilterInput!, pagination: PaginationInput, sort: SortInput): PortCallConnection!
+
+  """Query maritime trade flows."""
+  tradeFlows(filter: TradeFlowFilterInput!, pagination: PaginationInput): TradeFlowConnection!
+
+  """List available commodities."""
+  commodities(category: String, limit: Int): [Commodity!]!
+
+  """Get cargo events for a vessel."""
+  cargoEvents(mmsi: String!, timeRange: TimeRangeInput, limit: Int): [CargoEvent!]!
+
+  # ── Flight Tracking ──────────────────────────
+
+  """Fetch an aircraft by ICAO 24-bit address."""
+  aircraft(icao24: String!): Aircraft
+
+  """Search aircraft."""
+  aircraftSearch(registration: String, operator: String, limit: Int): [Aircraft!]!
+
+  """Fetch a single flight by ID."""
+  flight(id: ID!): Flight
+
+  """Search flights using filters."""
+  flights(filter: FlightFilterInput!, pagination: PaginationInput): FlightConnection!
+
+  """Get latest ADSB position for a list of aircraft."""
+  aircraftPositions(icao24List: [String!]!, maxAgeMinutes: Int): [AircraftPosition!]!
+
+  """Fetch an airline by ICAO code."""
+  airline(icaoCode: String!): Airline
+
+  """Search airlines."""
+  airlines(name: String, country: String, limit: Int): [Airline!]!
+
+  """Fetch an airport by ICAO code."""
+  airport(icaoCode: String!): Airport
+
+  """Search airports."""
+  airports(name: String, country: String, boundingBox: BoundingBoxInput, limit: Int): [Airport!]!
+
+  # ── Weather Intelligence ─────────────────────
+
+  """Get weather observations for a point or area."""
+  weatherObservations(filter: WeatherFilterInput!, pagination: PaginationInput): WeatherObservationConnection!
+
+  """Get the latest weather forecast for a bounding box."""
+  weatherForecast(boundingBox: BoundingBoxInput!, horizonHours: Int, model: String): WeatherForecast
+
+  """List active weather alerts for a region."""
+  weatherAlerts(boundingBox: BoundingBoxInput!, limit: Int): [WeatherAlert!]!
+
+  """Get tropical storm tracks."""
+  stormTracks(basin: String, active: Boolean, limit: Int): [StormTrack!]!
+
+  # ── Satellite Coverage ───────────────────────
+
+  """List upcoming satellite passes for a ground point."""
+  satellitePasses(latitude: Float!, longitude: Float!, hoursAhead: Int): [SatellitePass!]!
+
+  """Get satellite coverage statistics for an area."""
+  coverageStatistics(boundingBox: BoundingBoxInput!, timeRange: TimeRangeInput!): CoverageStatistics!
+
+  # ── Subscriptions Management ─────────────────
+
+  """List vessel tracking subscriptions."""
+  vesselSubscriptions: [VesselSubscription!]!
+
+  """List flight tracking subscriptions."""
+  flightSubscriptions: [FlightSubscription!]!
+
+  # ── API Metadata ─────────────────────────────
+
+  """Get current API usage and quota for the authenticated token."""
+  apiUsage: ApiUsage!
+}
+
+# ─────────────────────────────────────────────
+# Mutation Root
+# ─────────────────────────────────────────────
+
+type Mutation {
+  """Create a new vessel tracking subscription."""
+  createVesselSubscription(input: VesselSubscriptionInput!): VesselSubscription!
+
+  """Update an existing vessel tracking subscription."""
+  updateVesselSubscription(id: ID!, input: VesselSubscriptionInput!): VesselSubscription!
+
+  """Delete a vessel tracking subscription."""
+  deleteVesselSubscription(id: ID!): Boolean!
+
+  """Pause or resume a vessel tracking subscription."""
+  toggleVesselSubscription(id: ID!, active: Boolean!): VesselSubscription!
+
+  """Create a new flight tracking subscription."""
+  createFlightSubscription(input: FlightSubscriptionInput!): FlightSubscription!
+
+  """Update an existing flight tracking subscription."""
+  updateFlightSubscription(id: ID!, input: FlightSubscriptionInput!): FlightSubscription!
+
+  """Delete a flight tracking subscription."""
+  deleteFlightSubscription(id: ID!): Boolean!
+
+  """Pause or resume a flight tracking subscription."""
+  toggleFlightSubscription(id: ID!, active: Boolean!): FlightSubscription!
+}

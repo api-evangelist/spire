@@ -1,9 +1,11 @@
 aid: spire
 name: SPIRE
-description: SPIRE (SPIFFE Runtime Environment) is the reference implementation of the SPIFFE standard, providing a toolchain
-  for establishing trust between software systems across a wide variety of hosting platforms through automated attestation
-  and workload identity distribution. SPIRE manages a certificate authority, performs node and workload attestation, and issues
-  SVIDs to workloads through the SPIFFE Workload API.
+description: SPIRE (SPIFFE Runtime Environment) is the reference implementation of
+  the SPIFFE standard, providing a toolchain for establishing trust between software
+  systems across a wide variety of hosting platforms through automated attestation
+  and workload identity distribution. SPIRE manages a certificate authority, performs
+  node and workload attestation, and issues SVIDs to workloads through the SPIFFE
+  Workload API.
 url: https://spiffe.io/docs/latest/spire-about/
 tags:
 - Authentication
@@ -19,9 +21,10 @@ type: Index
 apis:
 - aid: spire:spire-workload-api
   name: SPIRE Workload API
-  description: The SPIRE Agent exposes the SPIFFE Workload API as a Unix domain socket, allowing workloads running on the
-    same node to request their X.509-SVIDs and JWT-SVIDs without requiring any credentials. The Workload API also delivers
-    trust bundle updates so that workloads can verify the identity of other workloads.
+  description: The SPIRE Agent exposes the SPIFFE Workload API as a Unix domain socket,
+    allowing workloads running on the same node to request their X.509-SVIDs and JWT-SVIDs
+    without requiring any credentials. The Workload API also delivers trust bundle
+    updates so that workloads can verify the identity of other workloads.
   humanURL: https://spiffe.io/docs/latest/spire-about/spire-concepts/
   properties:
   - type: Documentation
@@ -32,6 +35,8 @@ apis:
     url: asyncapi/spire-workload-asyncapi.yml
   - type: GitHubRepository
     url: https://github.com/spiffe/spire
+  - url: graphql/spire-graphql.md
+    type: GraphQL
   tags:
   - gRPC
   - Identity
@@ -40,10 +45,11 @@ apis:
   - X.509
 - aid: spire:spire-server-api
   name: SPIRE Server API
-  description: The SPIRE Server exposes a gRPC API used by administrators and the SPIRE Agent to manage registration entries,
-    node attestation, bundle federation, and server health. It allows creating and managing workload registration entries
-    that define the SPIFFE IDs issued to workloads matching specified selectors, and supports federation with external SPIFFE
-    trust domains.
+  description: The SPIRE Server exposes a gRPC API used by administrators and the
+    SPIRE Agent to manage registration entries, node attestation, bundle federation,
+    and server health. It allows creating and managing workload registration entries
+    that define the SPIFFE IDs issued to workloads matching specified selectors, and
+    supports federation with external SPIFFE trust domains.
   humanURL: https://spiffe.io/docs/latest/deploying/spire_server/
   properties:
   - type: Documentation
@@ -62,8 +68,9 @@ apis:
   - Server
 - aid: spire:spire-agent-api
   name: SPIRE Agent API
-  description: The SPIRE Agent runs on each node and handles workload attestation, caching SVIDs, and serving the Workload
-    API. It exposes a health check endpoint and communicates with the SPIRE Server via node attestation to establish its own
+  description: The SPIRE Agent runs on each node and handles workload attestation,
+    caching SVIDs, and serving the Workload API. It exposes a health check endpoint
+    and communicates with the SPIRE Server via node attestation to establish its own
     identity before issuing identities to workloads.
   humanURL: https://spiffe.io/docs/latest/deploying/spire_agent/
   properties:
@@ -77,8 +84,6 @@ apis:
     url: openapi/spire-health-openapi.yml
   - type: JSONStructure
     url: json-structure/spire-registration-structure.json
-  - type: NaftikoCapability
-    url: capabilities/health-health.yaml
   tags:
   - Agent
   - Attestation
@@ -87,9 +92,11 @@ apis:
   - Security
 - aid: spire:spire-oidc-discovery-api
   name: SPIRE OIDC Discovery API
-  description: SPIRE includes an OIDC Discovery Provider that serves an OpenID Connect discovery document and JSON Web Key
-    Set (JWKS) endpoint, enabling workloads to present JWT-SVIDs to systems that support standard OIDC token validation. This
-    allows SPIRE-issued identities to be used with cloud provider IAM systems such as AWS, GCP, and Azure.
+  description: SPIRE includes an OIDC Discovery Provider that serves an OpenID Connect
+    discovery document and JSON Web Key Set (JWKS) endpoint, enabling workloads to
+    present JWT-SVIDs to systems that support standard OIDC token validation. This
+    allows SPIRE-issued identities to be used with cloud provider IAM systems such
+    as AWS, GCP, and Azure.
   humanURL: https://spiffe.io/docs/latest/keyless/oidc-federation-aws/
   properties:
   - type: Documentation
@@ -100,10 +107,6 @@ apis:
     url: openapi/spire-oidc-discovery-openapi.yml
   - type: JSONStructure
     url: json-structure/spire-svid-structure.json
-  - type: NaftikoCapability
-    url: capabilities/oidc-discovery-discovery.yaml
-  - type: NaftikoCapability
-    url: capabilities/oidc-discovery-keys.yaml
   tags:
   - Cloud
   - Federation
