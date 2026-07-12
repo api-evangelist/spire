@@ -114,6 +114,8 @@ apis:
   - JWT
   - OIDC
 common:
+- type: DomainSecurity
+  url: security/spire-domain-security.yml
 - type: Website
   url: https://spiffe.io/
 - type: Documentation
