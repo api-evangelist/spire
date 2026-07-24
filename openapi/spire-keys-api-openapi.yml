@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: SPIRE Health Check Discovery Keys API
+  description: 'SPIRE Server and SPIRE Agent both expose an optional HTTP health checking endpoint that provides liveness and readiness probes. When enabled via the health_checks configuration block, the endpoint allows orchestrators such as Kubernetes to determine whether a SPIRE component is alive and ready to serve requests. The endpoint listens on a configurable address and port (defaulting to localhost:80) and exposes two paths: one for liveness and one for readiness.'
+  version: '1.0'
+  contact:
+    name: SPIFFE Community
+    url: https://spiffe.io/community/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+- url: http://{bind_address}:{bind_port}
+  description: SPIRE Health Check Listener
+  variables:
+    bind_address:
+      default: localhost
+      description: Address the health check listener binds to.
+    bind_port:
+      default: '80'
+      description: Port the health check listener binds to.
+tags:
+- name: Keys
+  description: JSON Web Key Set endpoint that exposes public keys used to verify JWT-SVIDs issued by SPIRE.
+paths:
+  /keys:
+    get:
+      operationId: getJWKS
+      summary: SPIRE Get JSON Web Key Set
+      description: Returns the JSON Web Key Set (JWKS) containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys are derived from the SPIRE trust bundle and are automatically rotated as SPIRE rotates its signing keys. Consumers must re-fetch this endpoint periodically to stay current with key rotations. Supported signing algorithms include RS256, ES256, and ES384.
+      tags:
+      - Keys
+      responses:
+        '200':
+          description: JSON Web Key Set containing public verification keys
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JWKS'
+components:
+  schemas:
+    JWK:
+      type: object
+      description: A single JSON Web Key representing a public key used for JWT-SVID signature verification.
+      required:
+      - kty
+      - use
+      - kid
+      properties:
+        kty:
+          type: string
+          description: Key type. RSA for RS256 keys, EC for elliptic curve keys used with ES256 and ES384.
+          enum:
+          - RSA
+          - EC
+        use:
+          type: string
+          description: Intended use of the key. Always sig (signature verification) for SPIRE JWT authority keys.
+          enum:
+          - sig
+        kid:
+          type: string
+          description: Key identifier uniquely identifying this key within the JWKS. Used to match the kid header in JWT-SVIDs to the correct verification key.
+          example: abc123def456
+        alg:
+          type: string
+          description: Algorithm intended for use with this key, such as RS256, ES256, or ES384.
+          enum:
+          - RS256
+          - ES256
+          - ES384
+        n:
+          type: string
+          description: 'RSA modulus value (Base64urlUInt-encoded). Present only for RSA keys (kty: RSA).'
+        e:
+          type: string
+          description: 'RSA public exponent value (Base64urlUInt-encoded). Present only for RSA keys (kty: RSA).'
+          example: AQAB
+        crv:
+          type: string
+          description: 'Elliptic curve name. Present only for EC keys (kty: EC).'
+          enum:
+          - P-256
+          - P-384
+        x:
+          type: string
+          description: 'Elliptic curve x-coordinate (Base64urlUInt-encoded). Present only for EC keys (kty: EC).'
+        y:
+          type: string
+          description: 'Elliptic curve y-coordinate (Base64urlUInt-encoded). Present only for EC keys (kty: EC).'
+    JWKS:
+      type: object
+      description: JSON Web Key Set document containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys correspond to the trust bundle JWT authorities for the SPIRE trust domain.
+      required:
+      - keys
+      properties:
+        keys:
+          type: array
+          description: Array of JSON Web Key objects representing the public keys in the SPIRE trust bundle. Each key corresponds to a JWT authority in the trust domain's bundle.
+          items:
+            $ref: '#/components/schemas/JWK'
+externalDocs:
+  description: SPIRE Server Configuration Reference
+  url: https://spiffe.io/docs/latest/deploying/spire_server/

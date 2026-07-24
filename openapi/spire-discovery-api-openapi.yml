@@ -1,0 +1,93 @@
+openapi: 3.1.0
+info:
+  title: SPIRE Health Check Discovery API
+  description: 'SPIRE Server and SPIRE Agent both expose an optional HTTP health checking endpoint that provides liveness and readiness probes. When enabled via the health_checks configuration block, the endpoint allows orchestrators such as Kubernetes to determine whether a SPIRE component is alive and ready to serve requests. The endpoint listens on a configurable address and port (defaulting to localhost:80) and exposes two paths: one for liveness and one for readiness.'
+  version: '1.0'
+  contact:
+    name: SPIFFE Community
+    url: https://spiffe.io/community/
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+- url: http://{bind_address}:{bind_port}
+  description: SPIRE Health Check Listener
+  variables:
+    bind_address:
+      default: localhost
+      description: Address the health check listener binds to.
+    bind_port:
+      default: '80'
+      description: Port the health check listener binds to.
+tags:
+- name: Discovery
+  description: OpenID Connect discovery document endpoint that describes the OIDC provider configuration and supported capabilities.
+paths:
+  /.well-known/openid-configuration:
+    get:
+      operationId: getOpenIDConfiguration
+      summary: SPIRE Get OpenID Connect discovery document
+      description: Returns the OpenID Connect discovery document describing the OIDC provider's configuration. The document includes the issuer URL, JWKS URI, supported response types, subject types, and supported signing algorithms. This endpoint is used by OIDC-compatible systems to auto-configure themselves to validate JWT-SVIDs issued by SPIRE. The path prefix can be customized via the server_path_prefix option.
+      tags:
+      - Discovery
+      responses:
+        '200':
+          description: OpenID Connect discovery document
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenIDConfiguration'
+components:
+  schemas:
+    OpenIDConfiguration:
+      type: object
+      description: OpenID Connect discovery document returned by the /.well-known/openid-configuration endpoint. Describes the OIDC provider's issuer, key location, and supported capabilities for JWT validation.
+      required:
+      - issuer
+      - jwks_uri
+      - authorization_endpoint
+      - response_types_supported
+      - subject_types_supported
+      - id_token_signing_alg_values_supported
+      properties:
+        issuer:
+          type: string
+          format: uri
+          description: The HTTPS URL identifying the OIDC provider. This must match the issuer claim in JWT-SVIDs issued by SPIRE and corresponds to the trust domain's SPIFFE ID base URL.
+          example: https://oidc-discovery.example.com
+        jwks_uri:
+          type: string
+          format: uri
+          description: URL of the JSON Web Key Set document containing public keys for verifying JWT signatures. Typically the /keys endpoint on the same host.
+          example: https://oidc-discovery.example.com/keys
+        authorization_endpoint:
+          type: string
+          format: uri
+          description: URL of the authorization endpoint. SPIRE's OIDC provider does not perform interactive authorization flows; this field is present for OIDC spec compliance but is not functional.
+          example: https://oidc-discovery.example.com/authorize
+        response_types_supported:
+          type: array
+          description: List of OAuth 2.0 response type values that this authorization server supports. SPIRE supports the id_token response type.
+          items:
+            type: string
+            enum:
+            - id_token
+        subject_types_supported:
+          type: array
+          description: List of subject identifier types supported. SPIRE uses the public subject type.
+          items:
+            type: string
+            enum:
+            - public
+        id_token_signing_alg_values_supported:
+          type: array
+          description: List of JWS signing algorithms supported for JWT-SVID signing. SPIRE supports RS256, ES256, and ES384.
+          items:
+            type: string
+            enum:
+            - RS256
+            - ES256
+            - ES384
+externalDocs:
+  description: SPIRE Server Configuration Reference
+  url: https://spiffe.io/docs/latest/deploying/spire_server/
