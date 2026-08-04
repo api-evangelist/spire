@@ -1,0 +1,18 @@
+{
+  "provider": "spire",
+  "sources": [
+    "spire-discovery-api-openapi.yml",
+    "spire-health-api-openapi.yml",
+    "spire-keys-api-openapi.yml"
+  ],
+  "outputs": [
+    "spire-discovery-api-openapi.yml",
+    "spire-health-api-openapi.yml",
+    "spire-keys-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
