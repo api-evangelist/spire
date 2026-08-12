@@ -155,6 +155,9 @@ apis:
   - type: JSONStructure
     url: json-structure/spire-svid-structure.json
 common:
+- type: License
+  name: Apache-2.0
+  url: https://github.com/spiffe/spire/blob/main/LICENSE
 - type: AgenticAccess
   url: agentic-access/spire-agentic-access.yml
 - type: DomainSecurity
@@ -193,8 +196,6 @@ common:
   url: json-ld/spire-context.jsonld
 - type: SpectralRules
   url: rules/spire-rules.yml
-- type: Capabilities
-  url: capabilities/workload-identity.yaml
 - type: Vocabulary
   url: vocabulary/spire-vocabulary.yml
 maintainers:
