@@ -1,0 +1,290 @@
+{
+  "item": [
+    {
+      "id": "085c7196-7e4c-4ad1-b9e7-58f76443aaef",
+      "name": "Health",
+      "description": {
+        "content": "Liveness and readiness health check endpoints for SPIRE Server and SPIRE Agent components, suitable for use as Kubernetes probes.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "9708052a-8b16-4d24-a7f3-d381119b2ac0",
+          "name": "SPIRE Liveness probe",
+          "request": {
+            "name": "SPIRE Liveness probe",
+            "description": {
+              "content": "Returns HTTP 200 if the SPIRE component process is alive and running. A non-200 response or connection failure indicates the process should be restarted. This endpoint is suitable for use as a Kubernetes livenessProbe. The path can be customized via the live_path configuration option (default: /live).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "live"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "Address the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_address}}",
+                  "key": "bind_address"
+                },
+                {
+                  "description": "Port the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_port}}",
+                  "key": "bind_port"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "9931d53a-2aee-4c5d-8f5f-94c9de2013ff",
+              "name": "Component is alive",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "live"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "Address the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_address}}",
+                      "key": "bind_address"
+                    },
+                    {
+                      "description": "Port the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_port}}",
+                      "key": "bind_port"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "71908519-2155-4f69-93f3-34a23052d866",
+          "name": "SPIRE Readiness probe",
+          "request": {
+            "name": "SPIRE Readiness probe",
+            "description": {
+              "content": "Returns HTTP 200 if the SPIRE component is ready to serve requests. For the SPIRE Server, readiness indicates the server has completed initialization and can accept gRPC connections from agents and administrators. For the SPIRE Agent, readiness indicates it has successfully attested to the server and is able to serve the Workload API. The path can be customized via the ready_path configuration option (default: /ready).",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "ready"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "Address the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_address}}",
+                  "key": "bind_address"
+                },
+                {
+                  "description": "Port the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_port}}",
+                  "key": "bind_port"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "5b980b84-7ca1-4f60-a800-6255d12c4b0e",
+              "name": "Component is ready to serve requests",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "ready"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "Address the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_address}}",
+                      "key": "bind_address"
+                    },
+                    {
+                      "description": "Port the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_port}}",
+                      "key": "bind_port"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "55e8c405-1d4f-4045-a325-10932da574c8",
+              "name": "Component is not yet ready to serve requests",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "ready"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "Address the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_address}}",
+                      "key": "bind_address"
+                    },
+                    {
+                      "description": "Port the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_port}}",
+                      "key": "bind_port"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Service Unavailable",
+              "code": 503,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"ok\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "Address the health check listener binds to.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "localhost",
+      "key": "bind_address"
+    },
+    {
+      "description": {
+        "content": "Port the health check listener binds to.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "80",
+      "key": "bind_port"
+    },
+    {
+      "type": "string",
+      "value": "http://{{bind_address}}:{{bind_port}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "2cced485-6cae-41a0-89bf-dfd7a22abbf5",
+    "name": "SPIRE Check Discovery Health API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "SPIRE Server and SPIRE Agent both expose an optional HTTP health checking endpoint that provides liveness and readiness probes. When enabled via the health_checks configuration block, the endpoint allows orchestrators such as Kubernetes to determine whether a SPIRE component is alive and ready to serve requests. The endpoint listens on a configurable address and port (defaulting to localhost:80) and exposes two paths: one for liveness and one for readiness.\n\nContact Support:\n Name: SPIFFE Community",
+      "type": "text/plain"
+    }
+  }
+}

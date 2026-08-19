@@ -1,0 +1,148 @@
+{
+  "item": [
+    {
+      "id": "c77ee9c7-830f-439f-80df-a74b036b3f58",
+      "name": "Discovery",
+      "description": {
+        "content": "OpenID Connect discovery document endpoint that describes the OIDC provider configuration and supported capabilities.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "1a64c7b1-992c-4b8f-826c-4b99a1101eeb",
+          "name": "SPIRE Get OpenID Connect discovery document",
+          "request": {
+            "name": "SPIRE Get OpenID Connect discovery document",
+            "description": {
+              "content": "Returns the OpenID Connect discovery document describing the OIDC provider's configuration. The document includes the issuer URL, JWKS URI, supported response types, subject types, and supported signing algorithms. This endpoint is used by OIDC-compatible systems to auto-configure themselves to validate JWT-SVIDs issued by SPIRE. The path prefix can be customized via the server_path_prefix option.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                ".well-known",
+                "openid-configuration"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "description": "Address the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_address}}",
+                  "key": "bind_address"
+                },
+                {
+                  "description": "Port the health check listener binds to.",
+                  "type": "any",
+                  "value": "{{bind_port}}",
+                  "key": "bind_port"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "81a58add-2c6b-4775-a1aa-71c91dab5c3d",
+              "name": "OpenID Connect discovery document",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    ".well-known",
+                    "openid-configuration"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "description": "Address the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_address}}",
+                      "key": "bind_address"
+                    },
+                    {
+                      "description": "Port the health check listener binds to.",
+                      "type": "any",
+                      "value": "{{bind_port}}",
+                      "key": "bind_port"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"issuer\": \"https://oidc-discovery.example.com\",\n  \"jwks_uri\": \"https://oidc-discovery.example.com/keys\",\n  \"authorization_endpoint\": \"https://oidc-discovery.example.com/authorize\",\n  \"response_types_supported\": [\n    \"id_token\",\n    \"id_token\"\n  ],\n  \"subject_types_supported\": [\n    \"public\",\n    \"public\"\n  ],\n  \"id_token_signing_alg_values_supported\": [\n    \"RS256\",\n    \"ES256\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "description": {
+        "content": "Address the health check listener binds to.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "localhost",
+      "key": "bind_address"
+    },
+    {
+      "description": {
+        "content": "Port the health check listener binds to.",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "80",
+      "key": "bind_port"
+    },
+    {
+      "type": "string",
+      "value": "http://{{bind_address}}:{{bind_port}}",
+      "key": "baseUrl"
+    }
+  ],
+  "info": {
+    "_postman_id": "5e492003-a692-40be-963a-7c830e600776",
+    "name": "SPIRE Health Check Discovery API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "SPIRE Server and SPIRE Agent both expose an optional HTTP health checking endpoint that provides liveness and readiness probes. When enabled via the health_checks configuration block, the endpoint allows orchestrators such as Kubernetes to determine whether a SPIRE component is alive and ready to serve requests. The endpoint listens on a configurable address and port (defaulting to localhost:80) and exposes two paths: one for liveness and one for readiness.\n\nContact Support:\n Name: SPIFFE Community",
+      "type": "text/plain"
+    }
+  }
+}

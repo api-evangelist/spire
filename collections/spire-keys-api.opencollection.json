@@ -1,0 +1,29 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "SPIRE Health Check Discovery Keys API",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Keys",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "SPIRE Get JSON Web Key Set",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{bind_address}:{bind_port}/keys"
+          },
+          "docs": "Returns the JSON Web Key Set (JWKS) containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys are derived from the SPIRE trust bundle and are automatically rotated as SPIRE rotates its signing keys. Consumers must re-fetch this endpoint periodically to stay current with key rotations. Supported signing algorithms include RS256, ES256, and ES384."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

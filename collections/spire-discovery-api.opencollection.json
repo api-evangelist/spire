@@ -1,0 +1,29 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "SPIRE Health Check Discovery API",
+    "version": "1.0"
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Discovery",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "SPIRE Get OpenID Connect discovery document",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "http://{bind_address}:{bind_port}/.well-known/openid-configuration"
+          },
+          "docs": "Returns the OpenID Connect discovery document describing the OIDC provider's configuration. The document includes the issuer URL, JWKS URI, supported response types, subject types, and supported signing algorithms. This endpoint is used by OIDC-compatible systems to auto-configure themselves to validate JWT-SVIDs issued by SPIRE. The path prefix can be customized via the server_path_prefix option."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
