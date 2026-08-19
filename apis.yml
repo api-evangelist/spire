@@ -29,7 +29,7 @@ tags:
 - Zero Trust
 created: '2025'
 modified: '2026-05-19'
-specificationVersion: '0.19'
+specificationVersion: '0.23'
 type: Index
 apis:
 - aid: spire:spire-workload-api
