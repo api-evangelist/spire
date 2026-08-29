@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: SPIRE Check Discovery Health API
+  title: SPIRE Check Health API
   description: 'SPIRE Server and SPIRE Agent both expose an optional HTTP health checking endpoint that provides liveness and readiness probes. When enabled via the health_checks configuration block, the endpoint allows orchestrators such as Kubernetes to determine whether a SPIRE component is alive and ready to serve requests. The endpoint listens on a configurable address and port (defaulting to localhost:80) and exposes two paths: one for liveness and one for readiness.'
   version: '1.0'
   contact:

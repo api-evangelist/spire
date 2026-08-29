@@ -1,18 +1,25 @@
 {
   "provider": "spire",
   "sources": [
-    "spire-discovery-api-openapi.yml",
-    "spire-health-api-openapi.yml",
-    "spire-keys-api-openapi.yml"
+    "_original/spire-health-openapi.yml",
+    "_original/spire-oidc-discovery-openapi.yml"
   ],
   "outputs": [
-    "spire-discovery-api-openapi.yml",
     "spire-health-api-openapi.yml",
+    "spire-discovery-api-openapi.yml",
     "spire-keys-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "spire-health-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "spire-oidc-discovery-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0"
+  ],
+  "skipped": [
+    "spire-discovery-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spire-health-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "spire-keys-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
