@@ -1,4 +1,17 @@
 aid: spire
+deliveryModel:
+  model: self-hosted
+  license: Apache-2.0
+  open_source: true
+  commercial: false
+  callable_host: false
+  label: Self-hosted open source · you run it yourself
+  confidence: high
+  source:
+  - license
+  - openapi
+  generated: '2026-08-28'
+  method: derived
 accessModel:
   pricing: freemium
   onboarding: unknown
@@ -162,6 +175,14 @@ apis:
   - type: JSONStructure
     url: json-structure/spire-svid-structure.json
 common:
+- type: IssueTracker
+  url: https://github.com/spiffe/spire/issues
+- type: Releases
+  url: https://github.com/spiffe/spire/releases
+- type: CodeOfConduct
+  url: https://github.com/spiffe/spire/blob/main/CODE-OF-CONDUCT.md
+- type: ContributionGuide
+  url: https://github.com/spiffe/spire/blob/main/CONTRIBUTING.md
 - type: License
   name: Apache-2.0
   url: https://github.com/spiffe/spire/blob/main/LICENSE
