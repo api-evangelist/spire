@@ -5,7 +5,7 @@
       "source": "https://spiffe.io/index.xml",
       "feed_url": "https://spiffe.io/index.xml",
       "title": "",
-      "saved": 1,
+      "saved": 0,
       "method": "feed"
     },
     {
@@ -13,6 +13,6 @@
       "error": "HTTPError"
     }
   ],
-  "fetched": "2026-08-22T20:20:02Z",
+  "fetched": "2026-08-30T22:33:40Z",
   "post_count": 55
 }
