@@ -99,6 +99,12 @@ apis:
   - Attestation
   - gRPC
   - Registration
+  - Servers
+  tags_raw:
+  - Administration
+  - Attestation
+  - gRPC
+  - Registration
   - Server
 - aid: spire:spire-discovery-api
   name: SPIRE Discovery API
