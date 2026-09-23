@@ -36,6 +36,17 @@ paths:
                 $ref: '#/components/schemas/JWKS'
 components:
   schemas:
+    JWKS:
+      type: object
+      description: JSON Web Key Set document containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys correspond to the trust bundle JWT authorities for the SPIRE trust domain.
+      required:
+      - keys
+      properties:
+        keys:
+          type: array
+          description: Array of JSON Web Key objects representing the public keys in the SPIRE trust bundle. Each key corresponds to a JWT authority in the trust domain's bundle.
+          items:
+            $ref: '#/components/schemas/JWK'
     JWK:
       type: object
       description: A single JSON Web Key representing a public key used for JWT-SVID signature verification.
@@ -85,17 +96,6 @@ components:
         y:
           type: string
           description: 'Elliptic curve y-coordinate (Base64urlUInt-encoded). Present only for EC keys (kty: EC).'
-    JWKS:
-      type: object
-      description: JSON Web Key Set document containing the public keys used to verify JWT-SVIDs issued by SPIRE. The keys correspond to the trust bundle JWT authorities for the SPIRE trust domain.
-      required:
-      - keys
-      properties:
-        keys:
-          type: array
-          description: Array of JSON Web Key objects representing the public keys in the SPIRE trust bundle. Each key corresponds to a JWT authority in the trust domain's bundle.
-          items:
-            $ref: '#/components/schemas/JWK'
 externalDocs:
   description: SPIRE OIDC Discovery Provider Documentation
   url: https://github.com/spiffe/spire/tree/main/support/oidc-discovery-provider
