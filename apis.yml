@@ -69,8 +69,6 @@ apis:
     url: asyncapi/spire-workload-asyncapi.yml
   - type: GitHubRepository
     url: https://github.com/spiffe/spire
-  - url: graphql/spire-graphql.md
-    type: GraphQL
   tags:
   - gRPC
   - Identity
