@@ -179,6 +179,9 @@ apis:
   - type: JSONStructure
     url: json-structure/spire-svid-structure.json
 common:
+- type: CapabilityMap
+  url: capabilities/spire-capability-edges.yml
+  name: SPIRE Business Capability Map
 - type: IssueTracker
   url: https://github.com/spiffe/spire/issues
 - type: Releases

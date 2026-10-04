@@ -1,0 +1,37 @@
+slug: spire
+provider: SPIRE
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 2
+edges:
+- tag: Discovery
+  spec_file: spire-discovery-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.75
+  evidence: exposes a minimal OpenID Connect discovery document and JSON Web Key Set (JWKS) endpoint ...
+    allows workloads to present JWT-SVIDs issued by SPIRE to systems that support standard OIDC token
+    validation, including cloud provider IAM systems
+  reason: OIDC discovery document for workload identity token validation — federation plumbing in service
+    of Identity & Access Management. Mapped to IAM with moderate confidence since the single endpoint
+    is a discovery metadata document.
+- tag: Keys
+  spec_file: spire-keys-api-openapi.yml
+  capability_id: BC-620.20
+  capability_id_l1: BC-620
+  capability_name: Identity & Access Management
+  confidence: 0.75
+  evidence: GET /keys  getJWKS  SPIRE Get JSON Web Key Set; The provider derives its key material from
+    the SPIRE Server or Agent trust bundle
+  reason: Publishes the JWKS used to validate workload identity tokens (JWT-SVIDs) — key/trust material
+    distribution underpinning workload identity and access management.
