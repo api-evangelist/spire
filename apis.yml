@@ -179,6 +179,12 @@ apis:
   - type: JSONStructure
     url: json-structure/spire-svid-structure.json
 common:
+- type: Plans
+  url: plans/spire-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/spire-rate-limits.yml
+- type: FinOps
+  url: finops/spire-finops.yml
 - type: CapabilityMap
   url: capabilities/spire-capability-edges.yml
   name: SPIRE Business Capability Map
